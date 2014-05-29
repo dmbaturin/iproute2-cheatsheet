@@ -16,6 +16,8 @@
 
       .copyright { text-align: center; }
 
+      .contributors { border: #dadada solid 1px; width: 100%; float: left; }
+
        hr { height: 1px; background-color: #aaaaaa; border: 0 none; }
     </style>
     <script type="text/javascript">
@@ -953,11 +955,28 @@ $ ip -6 rule show
              system <strong>stop routing any traffic</strong> until you restore your rules.</p>
         </div>
       </div>
-    <div class="copyright">
-      <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt;, 2013.</span> <br /><br />
-      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />
-    </div>
-
+      <div class="section">
+        <h3>netconf (sysctl configuration viewing)</h3>
+        <div class="subsection">
+          <h4>View sysctl configuration for all interfaces</h4>
+          <pre>ip netconf show</pre>
+        </div>
+        <div class="subsection">
+          <h4>View sysctl configuration for specific interface</h4>
+          <pre>ip netconf show dev ${interface}</pre>
+          <span>Examples:</span>
+          <pre>ip netconf show dev eth0</pre>
+        </div>
+      </div>
+      <div class="contributors">
+        <h3>Contributors:</h3>
+        <p>Nicolas Dichtel: netconf section.</p>
+      </div>
+      <div class="copyright">
+        <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt;, 2013.</span> <br /><br />
+        <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />
+        <br />
+      </div>
     </div>
   </body>
 </html>
