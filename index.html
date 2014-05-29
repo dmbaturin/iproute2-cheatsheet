@@ -176,7 +176,7 @@
           <h4>Connected routes</h4>
           <p>Some routes appear in the system without explicit configuration (against your will). </p>
           <p>Once you assign an address to an interface, a route to the subnet it belongs
-             is autoatically created via the interface you assigned it too. This is exactly
+             is automatically created via the interface you assigned it too. This is exactly
              the reason "ip address add" command wants subnet mask, otherwise the system would
              be unable to find out its subnet address and create connected routes properly.</p>
           <p>When an interface goes down, connected routes associated with it are removed.
@@ -207,9 +207,10 @@
           <span>If you want to view routes to 192.168.0.0/24 and all larger subnets,
                 use:</span>
           <pre>ip route show to match 192.168.0.0/24</pre>
-          <span>As routers look up routes from the most specific to less specific,
-                this is often useful for debug in situations when traffic to a smaller
-                subnet is sent the wrong way because a route is missing.</span>
+          <span>As routers prefer more specific routes to less specific,
+                this is often useful for debug in situations when traffic to a specific
+                subnet is sent the wrong way because a route to itis missing
+                but routes to larger subnets exist.</span>
         </div>
         <div class="subsection">
           <h4>View routes to exact subnet</h4>
@@ -223,7 +224,7 @@
           <pre>ip route get ${address}/${mask}</pre>
           <span>Example:</span>
           <pre>ip route get 192.168.0.0/24</pre>
-          <span>Note that in complex routing scenarios, like multipath routing,
+          <span>Note that in complex routing scenarios like multipath routing,
                 the result may be "correct but not complete", as it always shows
                 one route that will be used first. In most situations it's not
                 a problem, but never forget to look at the corresponsing "show" command
@@ -287,12 +288,12 @@
           <p>Blackhole routes have dual purpose. First one is straightforward, to discard traffic
              the hosts attempt to send to unwanted destinations, e.g. known malicious hosts.</p>
           <p>The second one is less obvious and uses the "longest match rule" as per RFC1812.
-             In some cases it's needed to make the router think it has a route to larger subnet,
+             In some cases you may need to make the router think it has a route to a larger subnet,
              e.g. when advertising the whole subnet via dynamic routing protocols. Large subnets
              are commonly broken into smaller parts, so if your subnet is 192.0.2.0/24, and you
-             have assigned 192.0.2.1/25 and 192.0.2.129/25 to your interfaces, you have connected
+             have assigned 192.0.2.1/25 and 192.0.2.129/25 to your interfaces, your system creates connected
              routes to the /25's, but not the whole /24, and routing daemons may not want to 
-             advertise /24 as you have no route to that exact subnet. The solution is to setup
+             advertise /24 because you have no route to that exact subnet. The solution is to setup
              a blackhole route to 192.0.2.0/24. Because routes to smaller subnets are preferred
              over larger subnets, it will not affect actual routing, but will convince routing
              daemons a route to the supernet exists.</p>
@@ -311,9 +312,9 @@
             <dt>throw</dt>
             <dd>Sends "net unreachable".</dd>
           </dl>
-          <p>Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g. DDoS),
-             as they generate a reply packet for every discarded packet. They can be good for implementing
-             internal policies, but consider firewall for this purpose first.</p>
+          <p>Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g. DDoS)
+             because they generate a reply packet for every discarded packet and thus create even greater traffic flow.
+             They can be good for implementing internal access policies, but consider firewall for this purpose first.</p>
           <p>"Throw" routes may be used for implementing policy-based routing, in non-default tables they
              stop current table lookup, but don't send ICMP error messages.</p>
         </div>
@@ -337,7 +338,7 @@
              gateway/interface with weight of 2 will get roughly two times more traffic than with weight of 1). You can have as many gateways
              as you want and mix gateway and interface routes, like:</p>
           <pre>ip route add default nexthop via 192.168.1.1 weight 1 nexthop dev ppp0 weight 10</pre>
-          <p> <a name="Warning:"></a> <strong>Warning:</strong>> the downside of this type of balancing is that packets are not guaranteed to be sent back
+          <p> <strong>Warning:</strong> the downside of this type of balancing is that packets are not guaranteed to be sent back
              through the same link they came in. This is called "asymmetric routing". In setups with pure routing that do not
              do any local traffic processing, including NAT, this is usually normal, and in some cases even unavoidable.</p>
           <p>If your system does anything but forwarding packets between interfaces, this may cause problems with incoming connections
