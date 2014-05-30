@@ -968,6 +968,68 @@ $ ip -6 rule show
           <pre>ip netconf show dev eth0</pre>
         </div>
       </div>
+      <div class="section">
+        <h3>Network namespace management</h3>
+        <p>Network namespaces are isolated network stack instances within a single machine. They can be used
+           for security domain separation, managing traffic flows between virtual machines and so on.</p>
+        <p>Every namespace is a complete copy of the networking stack with its own interfaces, addresses,
+           routes etc. You can run processes inside a namespace and bridge namespaces to physical interfaces.</p>
+        <div class="subsection">
+          <h4>Create a namespace</h4>
+          <pre>ip netns add ${namespace name}</pre>
+          <span>Examples:</span>
+          <pre>ip netns add foo</pre>
+        </div>
+        <div class="subsection">
+          <h4>List existing namespaces</h4>
+          <pre>ip netns list</pre>
+        </div>
+        <div class="subsection">
+          <h4>Delete a namespace</h4>
+          <pre>ip netns delete ${namespace name}</pre>
+          <span>Examples:</span>
+          <pre>ip netns delete foo</pre>
+        </div>
+        <div class="subsection">
+          <h4>Run a process inside namespace</h4>
+          <pre>ip netns exec ${namespace name} ${command}</pre>
+          <span>Examples:</span>
+          <pre>ip netns exec foo /bin/sh</pre>
+          <p><strong>Note:</strong> assigning a process to a non-default namespace requires
+             root privileges.</p>
+        </div>
+        <div class="subsection">
+          <h4>Listing all processes assigned to a namespace</h4>
+          <pre>ip netns pids ${namespace name}</pre>
+          <p>The output will be a list of PIDs.</p>
+        </div>
+        <div class="subsection">
+          <h4>Identifying process' primary namespace</h4>
+          <pre>ip netns identify ${pid}</pre>
+        </div>
+        <div class="subsection">
+          <h4>Assigning a network interface to a namespace</h4>
+          <pre>ip link set dev ${interface name} netns ${namespace name}</pre>
+          <pre>ip link set dev ${interface name} netns ${pid}</pre>
+          <span>Examples:</span>
+          <pre>ip link set dev eth0.100 netns foo</pre>
+          <p><strong>Note:</strong> once you assign an interface to a namespace, it disappears
+             from the default namespace and you will have to perform all operations with it via
+             "ip netns exec ${netspace name}", like "ip netns exec ${netspace name} ip link list".</p>
+          <p>If you specify a PID instead of a namespace name, the interfaces gets assigned to the primary
+             namespace of the process with that PID. This way you can reassign an interface back to default
+             namespace with e.g. "ip netns exec ${namespace name} ip link set dev ${intf} netns 1" 
+             (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).</p>
+        </div>
+        <div class="subsection">
+          <h4>Connect one namespace with another</h4>
+          <p>This can be done by creating two veth links and assigning them two different namespaces.</p>
+          <pre>ip link add name veth1 type veth peer veth2</pre>
+          <pre>ip link set dev veth1 netns foo</pre>
+          <pre>ip link add name veth2 type veth peer veth1</pre>
+          <pre>ip link set dev veth2 netns bar</pre>
+        </div>
+      </div>
       <div class="contributors">
         <h3>Contributors:</h3>
         <p>Nicolas Dichtel: netconf section.</p>
