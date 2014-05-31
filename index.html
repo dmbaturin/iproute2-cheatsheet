@@ -999,16 +999,16 @@ $ ip -6 rule show
              root privileges.</p>
         </div>
         <div class="subsection">
-          <h4>Listing all processes assigned to a namespace</h4>
+          <h4>List all processes assigned to a namespace</h4>
           <pre>ip netns pids ${namespace name}</pre>
           <p>The output will be a list of PIDs.</p>
         </div>
         <div class="subsection">
-          <h4>Identifying process' primary namespace</h4>
+          <h4>Identify process' primary namespace</h4>
           <pre>ip netns identify ${pid}</pre>
         </div>
         <div class="subsection">
-          <h4>Assigning a network interface to a namespace</h4>
+          <h4>Assign network interface to a namespace</h4>
           <pre>ip link set dev ${interface name} netns ${namespace name}</pre>
           <pre>ip link set dev ${interface name} netns ${pid}</pre>
           <span>Examples:</span>
@@ -1016,18 +1016,32 @@ $ ip -6 rule show
           <p><strong>Note:</strong> once you assign an interface to a namespace, it disappears
              from the default namespace and you will have to perform all operations with it via
              "ip netns exec ${netspace name}", like "ip netns exec ${netspace name} ip link list".</p>
+          <p>Moreover, when you move an interface to another namespace, it loses all existing configuration
+             such as IP addresses configured on it and goes to DOWN state. You need to bring it back up and
+             reconfigure.</p>
           <p>If you specify a PID instead of a namespace name, the interfaces gets assigned to the primary
              namespace of the process with that PID. This way you can reassign an interface back to default
              namespace with e.g. "ip netns exec ${namespace name} ip link set dev ${intf} netns 1" 
              (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).</p>
         </div>
         <div class="subsection">
-          <h4>Connect one namespace with another</h4>
-          <p>This can be done by creating two veth links and assigning them two different namespaces.</p>
-          <pre>ip link add name veth1 type veth peer veth2</pre>
-          <pre>ip link set dev veth1 netns foo</pre>
-          <pre>ip link add name veth2 type veth peer veth1</pre>
-          <pre>ip link set dev veth2 netns bar</pre>
+          <h4>Connect one namespace to another</h4>
+          <p>This can be done by creating two veth links and assigning them two different namespaces.
+             Suppose you want to connect namespace "foo" to the default namespace.</p>
+          <span>Create a pair of veth devices:</span>
+          <pre>ip link add name veth1 type veth peer name veth2</pre>
+          <span>Move veth2 to namespace foo:</span>
+          <pre>ip link set dev veth2 netns foo</pre>
+          <span>Bring veth2 and add an address in "foo" namespace:</span>
+          <pre>ip netns exec foo ip link set dev veth2 up</pre>
+          <pre>ip netns exec foo ip address add 10.1.1.1/24 dev veth2</pre>
+          <span>Add an address to veth1 that stays in default namespace:</span>
+          <pre>ip address add 10.1.1.2/24 dev veth1</pre>
+          <p>Now you can ping 10.1.1.1 which if in foo namespace, and setup routes to
+             subnets configured in other interfaces of that namespace.</p>
+          <p>If you want switching instead of routing, you can bridge those veth
+             interfaces with other interfaces in corresponding namespaces. Same technique
+             can be used to connect namespaces to physical networks.</p>
         </div>
       </div>
       <div class="contributors">
