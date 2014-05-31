@@ -541,6 +541,18 @@
              in conjunction with tc. This is also far beyond the scope of this document, consult tc
              documentation.</p>
         </div>
+        <div class="subsection">
+          <h4>Create a pair of virtual ethernet devices</h4>
+          <p>Virtual ethernet (veth) devices always come in pairs and work as a bidirectional pipe,
+             whatever comes into one of them, comes out of another. They are used in conjunction with
+             system partitioning features such as network namespaces and containers (OpenVZ and LXC)
+             for connecting one partition to another.</p>
+          <pre>ip link add name ${first device name} type veth peer name ${second device name}</pre>
+          <span>Examples:</span>
+          <pre>ip link add name veth-host type veth peer name veth-guest</pre>
+          <p><strong>Note:</strong> virtual ethernet devices are created in UP state, no need to
+             bring them up manually after creation.</p>
+        </div>
       </div>
       <div class="section">
         <h3>Neighbor (ARP and NDP) tables management</h3>
