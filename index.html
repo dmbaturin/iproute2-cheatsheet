@@ -1009,6 +1009,10 @@ $ ip -6 rule show
           <pre>ip netns exec foo /bin/sh</pre>
           <p><strong>Note:</strong> assigning a process to a non-default namespace requires
              root privileges.</p>
+          <p>You can run any processes inside a namespace, in particular you can run "ip"
+             itself, commands like in this "ip netns exec foo ip link list" in this section
+             are not a special syntax but simply executing another copy of "ip" in a namespace.
+             You can run an interactive shell inside a namespace as well.</p>
         </div>
         <div class="subsection">
           <h4>List all processes assigned to a namespace</h4>
@@ -1018,6 +1022,8 @@ $ ip -6 rule show
         <div class="subsection">
           <h4>Identify process' primary namespace</h4>
           <pre>ip netns identify ${pid}</pre>
+          <span>Examples:</span>
+          <pre>ip netns identify 9000</pre>
         </div>
         <div class="subsection">
           <h4>Assign network interface to a namespace</h4>
@@ -1027,11 +1033,11 @@ $ ip -6 rule show
           <pre>ip link set dev eth0.100 netns foo</pre>
           <p><strong>Note:</strong> once you assign an interface to a namespace, it disappears
              from the default namespace and you will have to perform all operations with it via
-             "ip netns exec ${netspace name}", like "ip netns exec ${netspace name} ip link list".</p>
+             "ip netns exec ${netspace name}", as in "ip netns exec ${netspace name} ip link set dev dummy0 down".</p>
           <p>Moreover, when you move an interface to another namespace, it loses all existing configuration
              such as IP addresses configured on it and goes to DOWN state. You need to bring it back up and
              reconfigure.</p>
-          <p>If you specify a PID instead of a namespace name, the interfaces gets assigned to the primary
+          <p>If you specify a PID instead of a namespace name, the interface gets assigned to the primary
              namespace of the process with that PID. This way you can reassign an interface back to default
              namespace with e.g. "ip netns exec ${namespace name} ip link set dev ${intf} netns 1" 
              (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).</p>
@@ -1047,7 +1053,7 @@ $ ip -6 rule show
           <span>Bring veth2 and add an address in "foo" namespace:</span>
           <pre>ip netns exec foo ip link set dev veth2 up</pre>
           <pre>ip netns exec foo ip address add 10.1.1.1/24 dev veth2</pre>
-          <span>Add an address to veth1 that stays in default namespace:</span>
+          <span>Add an address to veth1, which stays in the default namespace:</span>
           <pre>ip address add 10.1.1.2/24 dev veth1</pre>
           <p>Now you can ping 10.1.1.1 which if in foo namespace, and setup routes to
              subnets configured in other interfaces of that namespace.</p>
