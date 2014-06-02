@@ -1073,8 +1073,23 @@ $ ip -6 rule show
            virtualization systems such as KVM to connect virtual machines running on different
            hypervisor nodes to each other and to outside world.</p>
         <p>Unlike GRE or L2TPv3 that are point to point, VXLAN replicates some properties of
-           multiple access networks by using IP multicast. Also it provides a built-in virtual network
+           multiple access switched networks by using IP multicast. Also it supports virtual network
            separation by transmitting a network identifier along with the frame.</p>
+        <p>The downside is that you will need to use a multicast routing protocol, typically PIM-SM,
+           to get it to work over routed networks.</p>
+        <p>The underlying encapsulation protocol for VXLAN is UDP.</p>
+        <div class="subsection">
+          <h4>Create a VXLAN link</h4>
+          <pre>ip link add name ${interface name} type vxlan \ </pre>
+          <pre>   id &lt;0-16777215&gt; \ </pre>
+          <pre>   dev ${source interface} \ </pre>
+          <pre>   group ${multicast address </pre>
+          <span>Example:</span>
+          <pre>ip link add name vxlan0 type vxlan \ </pre>
+          <pre>   id 42 dev eth0 group 239.0.0.1 </pre>
+          <p>After that you need to bring the link up and either bridge it with
+             another interface or assign an address.</p>
+        </div>
       </div>
       <div class="contributors">
         <h3>Contributors:</h3>
