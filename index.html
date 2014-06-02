@@ -555,6 +555,54 @@
         </div>
       </div>
       <div class="section">
+        <h3>Link group management</h3>
+        <p>Link groups are similar to port ranges found in managed switches. You can add network
+           interfaces to a numbered group and perform operations on all the interfaces from that group
+           at once.</p>
+        <p>Links not assigned to any group belong to group 0 aka "default".</p>
+        <div class="subsection">
+          <h4>Add an interface to a group</h4>
+          <pre>ip link set dev ${interface name} group ${group number}</pre>
+          <span>Examples:</span>
+          <pre>ip link set dev eth0 group 42</pre>
+          <pre>ip link set dev eth1 group 42</pre>
+        </div>
+        <div class="subsection">
+          <h4>Remove an interface from a group</h4>
+          <p>This can be done by assigning it to the default group.</p>
+          <pre>ip link set dev ${interface name} group 0</pre>
+          <pre>ip link set dev ${interface} group default</pre>
+          <span>Examples:</span>
+          <pre>ip link set dev tun10 group 0</pre>
+        </div>
+        <div class="subsection">
+          <h4>Assign a symbolic name to a group</h4>
+          <p>Group names are stored in /etc/iproute2/group file. Symbolic name "default"
+             for group 0 comes exactly from there. You can add your own, one per line,
+             following the same "${number} ${name}" format. You can have up to 255 named groups.</p>
+          <p>Once you configured a group name, number and name can be used interchangeably
+             in ip commands.</p>
+          <span>Example:</span>
+          <pre>echo "10    customer-vlans" > /etc/iproute2/group</pre>
+          <span>After that you can use that name in all operations, like in</span>
+          <pre>ip link set dev eth0.100 group customer-vlans</pre>
+        </div>
+        <div class="subsection">
+          <h4>Perform an operation on a group</h4>
+          <pre>ip link set group ${group number} ${operation and arguments}</pre>
+          <span>Examples:</span>
+          <pre>ip link set group 42 down</pre>
+          <pre>ip link set group uplinks mtu 1200</pre>
+        </div>
+        <div class="subsection">
+          <h4>View information about links from specific group</h4>
+          <p>Use usual information viewing command with "group ${group}" modifier.</p>
+          <span>Examples:</span>
+          <pre>ip link list group 42</pre>
+          <pre>ip address show group customers</pre>
+        </div>
+      </div>
+      <div class="section">
         <h3>Neighbor (ARP and NDP) tables management</h3>
         <p>For ladies and gentlemen who prefer UK spelling, this command family supports "neighbour" spelling too.</p>
         <hr />
