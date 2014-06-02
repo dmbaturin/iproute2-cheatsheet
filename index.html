@@ -896,7 +896,7 @@ tunnel_id ${tunnel identifier}
         <hr />
         <p>Policy-based routing (PBR) in Linux is designed the following way:
            first you create custom routing tables, then you create rules to tell
-           the kernel use those tables instead of default for specific traffic.</p>
+           the kernel it should use those tables instead of the default table for specific traffic.</p>
         <p>Some tables are predefined:</p>
         <dl>
           <dt> <strong>local</strong> (table 255)</dt>
@@ -915,11 +915,12 @@ tunnel_id ${tunnel identifier}
           <pre>ip route add 0.0.0.0/0 via 192.168.0.1 table ISP2</pre>
           <pre>ip route add 2001:db8::/48 dev eth1 table 100</pre>
           <p> <strong>Notes:</strong> You can use any route options described in "Route management" section
-              in policy routes too, the only different is the "table ${table id/name}" part at the end.</p>
+              in policy routes too, the only difference is the "table ${table id/name}" part at the end.</p>
           <p>Numeric table identifiers and names can be used interchangeably. To create your own symbolic
              names, edit <strong>/etc/iproute2/rt_tables</strong> config file.</p>
           <p>"delete", "change", "replace", or any other route actions work with any table too.</p>
-       	  <p>"ip route ... table main" or "ip route ... table 254" would have exact same effect to not specifying table at all.</p>
+       	  <p>"ip route ... table main" or "ip route ... table 254" would have exact same effect to
+             commands without a table part.</p>
         </div>
         <div class="subsection">
           <h4>View policy routes</h4>
@@ -934,14 +935,14 @@ tunnel_id ${tunnel identifier}
           <h4>General rule syntax</h4>
           <pre>ip rule add ${options} &lt;lookup ${table id or name}|blackhole|prohibit|unreachable&gt;</pre>
           <p>Traffic that matches the ${options} (described below) will be routed
-             according to the table ${table id or name} instead of the "main"/254 table if "table" action is used.</p>
+             according to the table with specified name/id instead of the "main"/254 table if "lookup" action is used.</p>
           <p>"blackhole", "prohibit", and "unreachable" actions that work the same way to route types with same names.
              In most of examples we will use "lookup" action as the most common.</p>
           <p>For IPv6 rules, use "ip -6", the rest of the syntax is the same.</p>
           <p>"table ${table id or name}" can be used as alias to "lookup ${table id or name}".</p>
         </div>
         <div class="subsection">
-          <h4>Create a rule to match source network</h4>
+          <h4>Create a rule to match a source network</h4>
           <pre>ip rule add from ${source network} ${action}</pre>
           <span>Examples:</span>
           <pre>ip rule add from 192.0.2.0/24 lookup 10</pre>
@@ -949,20 +950,20 @@ tunnel_id ${tunnel identifier}
           <p><strong>Notes:</strong> "all" can be used as shortand to 0.0.0.0/0 or ::/0</p>
         </div>
         <div class="subsection">
-          <h4>Create a rule to match destination network</h4>
+          <h4>Create a rule to match a destination network</h4>
           <pre>ip rule add to ${destination network} ${action}</pre>
           <span>Examples:</span>
           <pre>ip rule add to 192.0.2.0/24 blackhole</pre>
           <pre>ip -6 rule add to 2001:db8::/32 lookup 100</pre>
         </div>
         <div class="subsection">
-          <h4>Create a rule to match ToS field</h4>
+          <h4>Create a rule to match a ToS field value</h4>
           <pre>ip rule add tos ${ToS value} ${action}</pre>
           <span>Examples:</span>
           <pre>ip rule add tos 0x10 lookup 110</pre>
         </div>
         <div class="subsection">
-          <h4>Create a rule to match firewall mark</h4>
+          <h4>Create a rule to match a firewall mark value</h4>
           <pre>ip rule add fwmark ${mark} ${action}</pre>
           <span>Examples:</span>
           <pre>ip rule add fwmark 0x11 lookup 100</pre>
