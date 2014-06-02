@@ -584,7 +584,7 @@
           <p>Once you configured a group name, number and name can be used interchangeably
              in ip commands.</p>
           <span>Example:</span>
-          <pre>echo "10    customer-vlans" > /etc/iproute2/group</pre>
+          <pre>echo "10    customer-vlans" >> /etc/iproute2/group</pre>
           <span>After that you can use that name in all operations, like in</span>
           <pre>ip link set dev eth0.100 group customer-vlans</pre>
         </div>
