@@ -776,6 +776,7 @@ tun99: gre/ip  remote 10.46.1.20  local 10.91.19.110  ttl inherit
       </div>
       <div class="section">
         <h3>L2TPv3 pseudowire management</h3>
+        <hr />
         <p><a href="http://tools.ietf.org/html/rfc3931">L2TPv3</a> is a tunneling
            protocol commonly used for L2 pseudowires.</p>
         <p>In many distros L2TPv3 is compiled as a module, and may not be loaded by default.
@@ -879,6 +880,7 @@ tunnel_id ${tunnel identifier}
       </div>
       <div class="section">
         <h3>Policy-based routing</h3>
+        <hr />
         <p>Policy-based routing (PBR) in Linux is designed the following way:
            first you create custom routing tables, then you create rules to tell
            the kernel use those tables instead of default for specific traffic.</p>
@@ -1017,6 +1019,7 @@ $ ip -6 rule show
       </div>
       <div class="section">
         <h3>netconf (sysctl configuration viewing)</h3>
+        <hr />
         <div class="subsection">
           <h4>View sysctl configuration for all interfaces</h4>
           <pre>ip netconf show</pre>
@@ -1030,6 +1033,7 @@ $ ip -6 rule show
       </div>
       <div class="section">
         <h3>Network namespace management</h3>
+        <hr />
         <p>Network namespaces are isolated network stack instances within a single machine. They can be used
            for security domain separation, managing traffic flows between virtual machines and so on.</p>
         <p>Every namespace is a complete copy of the networking stack with its own interfaces, addresses,
@@ -1117,6 +1121,7 @@ $ ip -6 rule show
       </div>
       <div class="section">
         <h3>VXLAN management</h3>
+        <hr />
         <p>VXLAN is a layer 2 tunneling protocol that is commonly used in conjunction with
            virtualization systems such as KVM to connect virtual machines running on different
            hypervisor nodes to each other and to outside world.</p>
