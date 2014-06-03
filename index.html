@@ -1158,6 +1158,38 @@ $ ip -6 rule show
              another interface or assign an address.</p>
         </div>
       </div>
+      <div class="section">
+        <h3>Multicast management</h3>
+        <hr />
+        <p>Multicast is mostly handled by applications and routing daemons, so there is not much
+           you can and should do manually here. Multicast-related ip commands are mostly useful for debug.</p>
+        <div class="subsection">
+          <h4>View multicast groups</h4>
+          <pre>ip maddress show</pre>
+          <pre>ip maddress show ${interface name}</pre>
+          <span>Example:</span>
+<pre>$ip maddress show dev lo
+1:	lo
+	inet  224.0.0.1
+	inet6 ff02::1
+	inet6 ff01::1
+</pre>
+        </div>
+        <div class="subsection">
+          <h4>Add a link-layer multicast address</h4>
+          <p>You can not join an IP multicast group statically, but you can add a multicast MAC
+             address (even though it's rarely needed).</p>
+          <pre>ip maddress add ${MAC address} dev ${interface name}</pre>
+          <span>Example:</span>
+          <pre>ip maddress add 01:00:5e:00:00:ab dev eth0</pre>
+        </div>
+        <div class="subsection">
+          <p>Multicast routes can not be added manually, so this command can only show
+             multicast routes installed by a routing daemon. It supports the same modifiers to
+             unicast route viewing commands (iif, table, from etc.).</p>
+          <pre>ip mroute show</pre>
+        </div>
+      </div>
       <div class="contributors">
         <h3>Contributors:</h3>
         <p>Nicolas Dichtel: netconf section.</p>
