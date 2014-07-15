@@ -195,8 +195,8 @@
              be unable to find out its subnet address and create connected routes properly.</p>
           <p>When an interface goes down, connected routes associated with it are removed.
              This is used for inaccessible gateway detection so routes through gateways that
-             went inaccessible are also removed. Same mechanism prevents you from creating 
-             routes through inaccessible gateays.</p>
+             went inaccessible are removed. Same mechanism prevents you from creating 
+             routes through inaccessible gateways.</p>
         </div>
         <div class="subsection">
           <h4>View all routes</h4>
@@ -222,14 +222,14 @@
                 use:</span>
           <pre>ip route show to match 192.168.0.0/24</pre>
           <span>As routers prefer more specific routes to less specific,
-                this is often useful for debug in situations when traffic to a specific
-                subnet is sent the wrong way because a route to itis missing
+                this is often useful for debugging in situations when traffic to a specific
+                subnet is sent the wrong way because a route to it is missing
                 but routes to larger subnets exist.</span>
         </div>
         <div class="subsection">
           <h4>View routes to exact subnet</h4>
           <pre>ip route show to exact ${address}/${mask}</pre>
-          <span>If you want to see the routes to 192.168.0.0/25, but not to
+          <span>If you want to see the routes to 192.168.0.0/25, but not to,
                 say 192.168.0.0/25 and 192.168.0.0/16, you can use:</span>
           <pre>ip route show to exact 192.168.0.0/24</pre>
         </div>
@@ -248,8 +248,8 @@
           <h4>View route cache</h4>
           <pre>ip route show cached</pre>
           <span>To speed up routing table lookups, Linux uses
-                route caching. This commands displays the contents
-                of the route cache. It can be combined with modifiers
+                route caching. This command displays the contents
+                of the route cache. It can be used with modifiers
                 described above.</span>
         </div>
         <div class="subsection">
@@ -269,7 +269,7 @@
         </div>
         <div class="subsection">
           <h4>Change or replace routes</h4>
-          <p>You may use "change" command to change parameters of existing route.
+          <p>You may use "change" command to change parameters of existing routes.
              "Replace" command can be used to add new route or modify existing one if
              it doesn't exist. Examples:</p>
           <pre>ip route change 192.168.2.0/24 via 10.0.0.1</pre>
@@ -298,11 +298,12 @@
           <pre>ip route add blackhole ${address}/${mask}</pre>
           <span>Examples:</span>
           <pre>ip route add blackhole 192.0.2.1/32</pre>
-          <p>Traffic to the networks with such routes is silently discarded.</p>
+          <p>Traffic to destinations that match a blackhole route is silently discarded.</p>
           <p>Blackhole routes have dual purpose. First one is straightforward, to discard traffic
-             the hosts attempt to send to unwanted destinations, e.g. known malicious hosts.</p>
+             sent to unwanted destinations, e.g. known malicious hosts.</p>
           <p>The second one is less obvious and uses the "longest match rule" as per RFC1812.
-             In some cases you may need to make the router think it has a route to a larger subnet,
+             In some cases you may want the router to think it has a route to a larger subnet,
+             while you are not using it as a whole,
              e.g. when advertising the whole subnet via dynamic routing protocols. Large subnets
              are commonly broken into smaller parts, so if your subnet is 192.0.2.0/24, and you
              have assigned 192.0.2.1/25 and 192.0.2.129/25 to your interfaces, your system creates connected
@@ -310,7 +311,7 @@
              advertise /24 because you have no route to that exact subnet. The solution is to setup
              a blackhole route to 192.0.2.0/24. Because routes to smaller subnets are preferred
              over larger subnets, it will not affect actual routing, but will convince routing
-             daemons a route to the supernet exists.</p>
+             daemons there's a route to the supernet.</p>
         </div>
         <div class="subsection">
           <h4>Other special routes</h4>
@@ -349,12 +350,12 @@
           <h4>Multipath routing</h4>
           <pre>ip route add ${addresss}/${mask} nexthop via ${gateway 1} weight ${number} nexthop via ${gateway 2} weight ${number}</pre>
           <p>Multipath routes make the system balance packets across several links according to the weight (higher weight is preferred, so
-             gateway/interface with weight of 2 will get roughly two times more traffic than with weight of 1). You can have as many gateways
+             gateway/interface with weight of 2 will get roughly two times more traffic than another one with weight of 1). You can have as many gateways
              as you want and mix gateway and interface routes, like:</p>
           <pre>ip route add default nexthop via 192.168.1.1 weight 1 nexthop dev ppp0 weight 10</pre>
           <p> <strong>Warning:</strong> the downside of this type of balancing is that packets are not guaranteed to be sent back
-             through the same link they came in. This is called "asymmetric routing". In setups with pure routing that do not
-             do any local traffic processing, including NAT, this is usually normal, and in some cases even unavoidable.</p>
+             through the same link they came in. This is called "asymmetric routing". For routers that simply forward packets and don't
+             do any local traffic processing such as NAT, this is usually normal, and in some cases even unavoidable.</p>
           <p>If your system does anything but forwarding packets between interfaces, this may cause problems with incoming connections
              and some measures should be taken to prevent it.</p>
         </div>
@@ -364,11 +365,11 @@
         <hr />
         <p>Link is another name for network interface. Commands from "ip link" family perform operations
            that are common for all interface types, like viewing link information or setting MTU.</p>
-        <p>They also can create many types of interfaces, except for tunnel (IPIP, GRE etc.) and L2TP
+        <p>They also can create many types of interfaces, except for tunnel (IPIP, GRE etc.) and L2TPv3
             pseudowires that have their own commands.</p>
         <p>Note that interface name you set with "name ${name}" parameter of "ip link add" and "ip link set"
            commands may be arbitrary, and even contain unicode characters. It's better however to stick with
-           ASCII because other programs may not handle unicode correctly. Also it's better to use a consistent naming
+           ASCII because other programs may not handle unicode correctly. Also it's better to use a consistent
            convention for link names, and use link aliases to provide human descriptions.</p>
         <div class="subsection">
           <h4>View links</h4>
