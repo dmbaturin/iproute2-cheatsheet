@@ -478,8 +478,12 @@
           <span>Example:</span>
           <pre>ip link add name eth0.100 link eth0 type vlan id 100 # Create parent interface</pre>
           <pre>ip link add name eth0.100.200 link eth0.100 type vlan id 200 # Create child interface</pre>
-          <p>VLAN stacking (aka QinQ) is a way to encapsulate a VLAN into other VLAN. The common use case for it
-             is transferring customer VLANs through a provider network.</p>
+          <p>VLAN stacking (aka 802.3ad QinQ) is a way to encapsulate a VLAN into other VLAN. The common use case 
+             for it is like this: suppose you are a service provider and you have a customer who wants to connect
+             remote parts of their network together and use VLANs. Since the number of 802.1q tags is limited
+             and also customer VLANs may coincide with your own VLANs, you cannot just pass their traffic
+             through your network as is. With QinQ you can add a second tag to that traffic when it enters your network
+             and remove that tag when it exits, so there are no conflicts. </p>
           <p>Note that link MTU for the inner VLAN doesn't get adjusted automatically, you need to take care
              of it yourself and either decrease child interface MTU to at least 4 bytes, or increase parent MTU accordingly.</p>
         </div>
