@@ -1196,6 +1196,52 @@ $ ip -6 rule show
           <pre>ip mroute show</pre>
         </div>
       </div>
+      <div class="section">
+        <h3>Network event monitoring</h3>
+        <hr/>
+        <p>You can monitor certain network events with iproute2, such as changes in network configuration,
+           routing tables, and ARP/NDP tables.
+        </p>
+        <div class="subsection">
+          <h4>Monitor all events</h4>
+          <p>You may either call the command without parameters or explicitly specify "all".</p>
+          <pre>ip monitor</pre>
+          <pre>ip monitor all</pre>
+        </div>
+        <div class="subsection">
+          <h4>Monitor specific events</h4>
+          <pre>ip monitor ${event type}</pre>
+          <p>Event type can be:</p>
+          <dl>
+            <dt>link</dt>
+            <dd>Link state: interfaces going up and down, virtual interfaces getting created or 
+                destroyed etc.</dd>
+            <dt>address</dt>
+            <dd>Link address changes.</dd>
+            <dt>route</dt>
+            <dd>Routing table changes.</dd>
+            <dt>mroute</dt>
+            <dd>Multicast routing changes.</dd>
+            <dt>neigh</dt>
+            <dd>Changes in neighbor (ARP and NDP) tables.<dd>
+          </dl>
+          <p>When there are distinct IPv4 and IPv6 subsystems, the usual "-4" and "-6" options
+             allow you to display events only for specified protocol. As in:</p>
+          <pre>ip -4 monitor route</pre>
+          <pre>ip -6 monitor neigh</pre>
+          <pre>ip -4 monitor address</pre>
+        </div>
+        <div class="subsection">
+          <h4>Read a log file produced by rtmon</h4>
+          <p>iproute2 includes a program called "rtmon" that serves essentially the same purpose,
+             but writes events to a binary log file instead of displaying them. "ip monitor" command
+             allows you to read files created by the program".</p>
+          <pre>ip monitor ${event type} file ${path to the log file}</pre>
+          <p>rtmon syntax is similar to that of "ip monitor", except event type is limited to
+             link, address, route, and all; and address family is specified in "-family" option.</p>
+          <pre>rtmon [-family &lt;inet|inet6&gt;] [&lt;route|link|address|all&gt;] file ${log file path}</pre>
+        </div>
+      </div>
       <div class="contributors">
         <h3>Contributors:</h3>
         <p>Nicolas Dichtel: netconf section.</p>
