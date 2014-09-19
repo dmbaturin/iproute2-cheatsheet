@@ -134,7 +134,7 @@
           <pre>ip address show eth0</pre>
         </div>
         <div class="subsection">
-          <h4>Add address to an interface</h4>
+          <h4>Add an address to an interface</h4>
           <pre>ip address add ${address}/${mask} dev ${interface name}</pre>
           <span>Examples:</span>
           <pre>ip address add 192.0.2.10/27 dev eth0</pre>
@@ -143,7 +143,7 @@
              and will be used as source address by default.</p>
         </div>
         <div class="subsection">
-          <h4>Add address with human-readable description</h4>
+          <h4>Add an address with human-readable description</h4>
           <pre>ip address add ${address}/${mask} dev ${interface name} label ${interface name}:${description} </pre>
           <span>Examples:</span>
           <pre>ip address add 192.0.2.1/24 dev eth0 label eth0:my_wan_address</pre>
@@ -253,14 +253,14 @@
                 described above.</span>
         </div>
         <div class="subsection">
-          <h4>Add route via gateway</h4>
+          <h4>Add a route via gateway</h4>
           <pre>ip route add ${address}/${mask} via ${next hop}</pre>
           <span>Examples:</span>
           <pre>ip route add 192.0.2.128/25 via 192.0.2.1</pre>
           <pre>ip route add 2001:db8:1::/48 via 2001:db8:1::1</pre>
         </div>
         <div class="subsection">
-          <h4>Add route via interface</h4>
+          <h4>Add a route via interface</h4>
           <pre>ip route add ${address}/${mask} dev ${interface name}</pre>
           <span>Example:</span>
           <pre>ip route add 192.0.2.0/25 dev ppp0</pre>
@@ -268,7 +268,7 @@
                 like PPP tunnels where next hop address is not required.</span>
         </div>
         <div class="subsection">
-          <h4>Change or replace routes</h4>
+          <h4>Change or replace a route</h4>
           <p>You may use "change" command to change parameters of existing routes.
              "Replace" command can be used to add new route or modify existing one if
              it doesn't exist. Examples:</p>
@@ -372,13 +372,13 @@
            ASCII because other programs may not handle unicode correctly. Also it's better to use a consistent
            convention for link names, and use link aliases to provide human descriptions.</p>
         <div class="subsection">
-          <h4>View links</h4>
+          <h4>Show information about all links</h4>
           <pre>ip link show</pre>
           <pre>ip link list</pre>
           <span>These commands are equivalent and can be used with the same arguments.</span>
         </div>
         <div class="subsection">
-          <h4>View single link information</h4>
+          <h4>Show information about specific link</h4>
           <pre>ip link show dev ${interface name}</pre>
           <span>Examples:</span>
           <pre>ip link show dev eth0</pre>
@@ -386,7 +386,7 @@
           <span>The word "dev" may be omitted.</span>
         </div>
         <div class="subsection">
-          <h4>Bring link up or down</h4>
+          <h4>Bring a link up or down</h4>
           <pre>ip link set dev ${interface name} up</pre>
           <pre>ip link set dev ${interface name} down</pre>
           <span>Examples:</span>
@@ -416,7 +416,7 @@
              before doing it.</p>
         </div>
         <div class="subsection">
-          <h4>Change link layer address</h4>
+          <h4>Change link layer address (usually MAC address)</h4>
           <pre>ip link set dev ${interface name} address ${address}</pre>
           <p>Link layer address is a pretty broad concept. The most known 
              example is MAC address for ethernet devices. To change MAC
