@@ -134,6 +134,17 @@
           <pre>ip address show eth0</pre>
         </div>
         <div class="subsection">
+          <h4>Show addresses only for running interfaces</h4>
+          <pre>ip address show up</pre>
+        </div>
+        <div class="subsection">
+          <h4>Show only static or dynamic IPv6 addresses</h4>
+          <span>Show only statically configured addresses:</span>
+          <pre>ip address show [dev ${interface}] permanent</pre>
+          <span>Show only addresses learnt via autoconfiguration:</span>
+          <pre>ip address show [dev ${interface}] dynamic</pre>
+        </div>
+        <div class="subsection">
           <h4>Add an address to an interface</h4>
           <pre>ip address add ${address}/${mask} dev ${interface name}</pre>
           <span>Examples:</span>
