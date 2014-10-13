@@ -489,18 +489,21 @@
         </div>
         <div class="subsection">
           <h4>Create a QinQ interface (VLAN stacking)</h4>
-          <pre>ip link add name ${second VLAN interface} link ${parent VLAN interface} type vlan id ${tag}</pre>
+          <pre>ip link add name ${service interface} link ${physical interface} type vlan proto 802.1ad id ${service tag}</pre>
+          <pre>ip link add name ${client interface} link ${service interface} type vlan proto 802.1q id ${client tag}</pre>
           <span>Example:</span>
-          <pre>ip link add name eth0.100 link eth0 type vlan id 100 # Create parent interface</pre>
-          <pre>ip link add name eth0.100.200 link eth0.100 type vlan id 200 # Create child interface</pre>
-          <p>VLAN stacking (aka 802.3ad QinQ) is a way to encapsulate a VLAN into other VLAN. The common use case 
-             for it is like this: suppose you are a service provider and you have a customer who wants to connect
-             remote parts of their network together and use VLANs. Since the number of 802.1q tags is limited
-             and also customer VLANs may coincide with your own VLANs, you cannot just pass their traffic
-             through your network as is. With QinQ you can add a second tag to that traffic when it enters your network
-             and remove that tag when it exits, so there are no conflicts. </p>
-          <p>Note that link MTU for the inner VLAN doesn't get adjusted automatically, you need to take care
-             of it yourself and either decrease child interface MTU to at least 4 bytes, or increase parent MTU accordingly.</p>
+          <pre>ip link add name eth0.100 link eth0 type vlan proto 802.1ad id 100 # Create service tag interface</pre>
+          <pre>ip link add name eth0.100.200 link eth0.100 type vlan proto 802.1q id 200 # Create client tag interface</pre>
+          <p>VLAN stacking (aka 802.1ad QinQ) is a way to transmit VLAN tagged traffic over another VLAN. The common use case 
+             for it is like this: suppose you are a service provider and you have a customer who wants to use your network
+             infrastructure to connect parts of their network to each other. They use multiple VLANs in their network, so
+             an ordinary rented VLAN is not an option. With QinQ you can add a second tag to the customer traffic when it enters your network
+             and remove that tag when it exits, so there are no conflicts and you don't need to waste VLAN numbers.</p>
+          <p>The service tag is the VLAN tag the provider uses to carry client traffic through their network. The client tag
+             is the tag set by the customer.</p>
+          <p>Note that link MTU for the client VLAN interface is not adjusted automatically, you need to take care
+             of it yourself and either decrease the client interface MTU by at least 4 bytes, or increase the parent MTU accordingly.</p>
+          <p>Standards-compliant QinQ is available since Linux 3.10.</p>
         </div>
         <div class="subsection">
           <h4>Create pseudo-ethernet (aka macvlan) interface</h4>
@@ -1265,7 +1268,7 @@ $ ip -6 rule show
         <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt; 2013, 2014.</span> <br /><br />
         <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />
         <br />
-        <span>Last modified: 2014-09-19.</span>
+        <span>Last modified: 2014-10-13.</span>
       </div>
     </div>
   </body>
