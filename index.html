@@ -680,14 +680,14 @@
         <h3>Tunnel management</h3>
         <hr /> 
         <p>Tunnels are "network wormholes" that look like normal interfaces,
-           but packets sent to them are encapsulated into a network layer protocol
+           but packets sent through them are encapsulated into another protocol
            and sent to the other side of tunnel through multiple hosts, then 
-           decapsulated and processed in usual way. So you can pretend two
+           decapsulated and processed in usual way, so you can pretend two
            machines have direct connectivity, while they in fact do not.</p>
         <p>This is often used for virtual private networks (in conjunction with
            encrypted transport protocols like IPsec), or connecting networks
-           that use some protocol via an intermediate network that does not
-           (e.g. IPv6 networks via an IPv4 network).</p>
+           that use some protocol via an intermediate network that does not use it
+           (e.g. IPv6 networks separated by an IPv4-only segment).</p>
         <p><strong>Note:</strong> tunnels on their own offer zero security.
            They are as secure as their underlying network. So if you need
            security, use them over an encrypted transport, e.g. IPsec.</p>
