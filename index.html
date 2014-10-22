@@ -797,7 +797,8 @@
           <pre>ip tunnel del ${interface name}</pre>
           <span>Examples:</span>
           <pre>ip tunnel del gre1</pre>
-          <p>Note that this command does not support the word "delete", "del" is its full word.</p>
+          <p>Note that in older iproute2 versions this command did not support the full "delete" word, only "del".
+             Recent versions allow both full and abbreviated forms (tested in iproute2-ss131122).</p>
         </div>
         <div class="subsection">
           <h4>Modify a tunnel</h4>
