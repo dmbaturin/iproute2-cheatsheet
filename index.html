@@ -739,6 +739,8 @@
           <span>Examples:</span>
           <pre>ip link add gretap0 type gretap local 192.0.2.1 remote 203.0.113.3</pre>
           <p>This type of tunnels encapculates ethernet frames into IPv4 packets.</p>
+          <p>Recent kernel and iproute2 versions also support gretap over IPv6, you need to replace the mode with "ip6gretap"
+             to create an IPv6-based link.</p>
           <p>This probably should have been in "Links management" section, but as it involves encapsulation, it's here.
              Tunnel interface created this way looks like an L2 link, and it can be added to a bridge group. This is used
              to connect L2 segments via a routed network.</p>
@@ -751,7 +753,8 @@
           <pre>ip link set dev tun6 up</pre>
           <pre>ip address add 192.168.0.1/30 dev tun6</pre>
           <pre>ip address add 2001:db8:1::1/64 dev tun6</pre>
-          <p>GRE can encapsulate both IPv4 and IPv6 at the same time.</p>
+          <p>GRE can encapsulate both IPv4 and IPv6 at the same time. However, by default it uses IPv4 for transport,
+             for GRE over IPv6 there is a separate tunnel mode, "ip6gre".</p>
         </div>
         <div class="subsection">
           <h4>Create multiple GRE tunnels to the same endpoint</h4>
@@ -782,6 +785,12 @@
           <pre>ip neighbor add 10.0.0.1 lladd 192.0.2.1 dev tun8</pre>
           <p>Note that link-layer address is in this case an address of the same protocol. This one of the cases where link-layer address
              concept gets interesting.</p>
+        </div>
+        <div class="subsection">
+          <h4>Create a GRE tunnel over IPv6</h4>
+          <p>Recent kernel and iproute2 versions support GRE over IPv6. Point-to-point with no key:</p>
+          <pre>ip -6 tunnel add name ${interface name} mode ip6gre local ${local endpoint} remote ${remote endpoint}</pre>
+          <p>It should support all options and features supported by the IPv4 GRE described above.</p>
         </div>
         <div class="subsection">
           <h4>Delete a tunnel</h4>
