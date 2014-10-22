@@ -772,19 +772,19 @@
           <pre>ip tunnel add tun8 mode gre local 192.0.2.1 key 1234</pre>
           <pre>ip link set dev tun8 up</pre>
           <pre>ip address add 10.0.0.1/27 dev tun8</pre>
-          <p>Note the absence of ${remote endpoint address}. This is the same to what Cisco calls "mode gre multipoint".</p>
+          <p>Note the absence of ${remote endpoint address}. This is the same to what is called "mode gre multipoint" in Cisco IOS.</p>
           <p>In the absence of remote endpoint address the key is the only way to identify the tunnel traffic, so ${key value} is required.</p>
-          <p>This type of tunnel allows to communicate with multiple endpoints on the same interface. It's commonly used for
-             complex VPN setups with multiple endpoints communicating to each other (in Cisco terminology,  "dynamic multipoint VPN").</p>
-          <p>As there is no explicit remote endpoint address, obviously it's not enough to just create the tunnel. Your system needs to know
-             where other endpoints are.</p>
+          <p>This type of tunnels allows you to communicate with multiple endpoints by using the same tunnel interface. It's commonly used in
+             complex VPN setups with multiple endpoints communicating to one another (in Cisco terminology, "dynamic multipoint VPN").</p>
+          <p>As there is no explicit remote endpoint address, obviously it is not enough to just create a tunnel. Your system needs to know
+             where the other endpoints are.</p>
           <p>In real life NHRP (Next Hop Resolution Protocol) is used for it. For testing you can add peers manually (given remote endpoint
-              has 203.0.113.6 address on its physical interface and 10.0.0.2 on tunnel):</p>
+              uses 203.0.113.6 address on its physical interface and 10.0.0.2 on the tunnel):</p>
           <pre>ip neighbor add 10.0.0.2 lladdr 203.0.113.6 dev tun8</pre>
           <p>You will have to do it on the remote endpoint too, like:</p>
-          <pre>ip neighbor add 10.0.0.1 lladd 192.0.2.1 dev tun8</pre>
-          <p>Note that link-layer address is in this case an address of the same protocol. This one of the cases where link-layer address
-             concept gets interesting.</p>
+          <pre>ip neighbor add 10.0.0.1 lladdr 192.0.2.1 dev tun8</pre>
+          <p>Note that link-layer address and neighbor address are both IP addresses, so they are on the same OSI layer.
+             This one of the cases where link-layer address concept gets interesting.</p>
         </div>
         <div class="subsection">
           <h4>Create a GRE tunnel over IPv6</h4>
