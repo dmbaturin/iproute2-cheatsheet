@@ -260,12 +260,12 @@
                 output too.</span>
         </div>
         <div class="subsection">
-          <h4>View route cache</h4>
+          <h4>View route cache (pre 3.6 kernels only)</h4>
           <pre>ip route show cached</pre>
-          <span>To speed up routing table lookups, Linux uses
-                route caching. This command displays the contents
+          <span>Until the version 3.6, Linux used
+                route caching. In older kernels, this command displays the contents
                 of the route cache. It can be used with modifiers
-                described above.</span>
+                described above. In newer kernels it does nothing.</span>
         </div>
         <div class="subsection">
           <h4>Add a route via gateway</h4>
