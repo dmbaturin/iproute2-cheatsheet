@@ -121,8 +121,8 @@
       <div class="section">
         <h3>Address management</h3>
         <hr />
-        <p>In this section ${address} refers to host address in dotted decimal format, and
-           ${mask} refers to subnet mask either in prefix length or dotted decimal format.
+        <p>In this section ${address} value should be a host address in dotted decimal format, and
+           ${mask} can be either a dotted decimal subnet mask or a prefix length.
            That is, both 192.0.2.10/24 and 192.0.2.10/255.255.255.0 are equally acceptable.</p>
          <p> If you are not sure if something is a correct host address, use "ipcalc" or similar
              program to check.</p>
@@ -1058,7 +1058,7 @@ $ ip -6 rule show
 0:	from all lookup local 
 32766:	from all lookup main 
 </pre>
-          <p>The "from all lookup local" rule is special and can not be deleted. The "from all lookup main" is not,
+          <p>The "from all lookup local" rule is special and cannot be deleted. The "from all lookup main" is not,
              there may be valid reasons not to have it, e.g. if you want to route only traffic you created explicit
              rules for. As a side effect, if you do "ip rule flush", this rule will be deleted, which will make the
              system <strong>stop routing any traffic</strong> until you restore your rules.</p>
@@ -1210,7 +1210,7 @@ $ ip -6 rule show
         </div>
         <div class="subsection">
           <h4>Add a link-layer multicast address</h4>
-          <p>You can not join an IP multicast group statically, but you can add a multicast MAC
+          <p>You cannot join an IP multicast group manually, but you can add a multicast MAC
              address (even though it's rarely needed).</p>
           <pre>ip maddress add ${MAC address} dev ${interface name}</pre>
           <span>Example:</span>
@@ -1218,7 +1218,7 @@ $ ip -6 rule show
         </div>
         <div class="subsection">
           <h4>View multicast routes</h4>
-          <p>Multicast routes can not be added manually, so this command can only show
+          <p>Multicast routes cannot be added manually, so this command can only show
              multicast routes installed by a routing daemon. It supports the same modifiers to
              unicast route viewing commands (iif, table, from etc.).</p>
           <pre>ip mroute show</pre>
