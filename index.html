@@ -469,12 +469,12 @@
           <h4>Enable or disable ARP on an interface</h4>
           <pre>ip link set ${interface name} arp on</pre>
           <pre>ip link set ${interface name} arp off</pre>
-          <p>One may want to disable ARP to enforce MAC policy and allow only specific MACs
-             to communicate with the interface. Of course it's also needed to add those ARP tables
-             entries manually in this case (see <a href="#Neighbor (ARP and NDP) tables management">neighbor table management</a>
-             section. </p>
-          <p>In most cases it's better to configure MAC policy on the switch port though. Again, do not change this flag
-             without thinking first.</p>
+          <p>One may want to disable ARP to enforce a security policy and allow only specific MACs
+             to communicate with the interface. In this case neighbor table entries for whitelisted MACs
+             should be created manually (see <a href="#Neighbor (ARP and NDP) tables management">neighbor table management</a>
+             section), or nothing will be able to communicate with that interface. </p>
+          <p>In most cases it's better to configure MAC policy on an access layer switch though.
+             Do not change this flag unless you are sure what you are going to do and why.</p>
         </div>
         <div class="subsection">
           <h4>Create a VLAN interface</h4>
