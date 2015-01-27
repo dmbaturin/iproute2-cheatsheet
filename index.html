@@ -444,13 +444,15 @@
           <span>Examples:</span>
           <pre>ip link set dev tun0 mtu 1480</pre>
           <p>MTU stands for "Maximum Transmission Unit", the maximum size
-             of frames interface can transmit.</p>
-          <p>Apart from reducing fragmentation in encapsulated links like
+             of a frame an interface can transmit at once.</p>
+          <p>Apart from reducing fragmentation in tunnels like
              in example above, this is also used to increase performance of
-             gigabit ethernet linkst that support so called "jumbo frames"
-             (frames up to 9000 byte large). If all your equipment is
-             gig-e enabled, do something like
+             gigabit ethernet links that support so called "jumbo frames"
+             (frames up to 9000 bytes large). If all your equipment
+             supports gigabit ethernet, you may want to do something like
           <pre>ip link set dev eth0 mtu 9000</pre>
+          <p>Note that you may need to configure it on your L2 swithces too,
+             some of them have it disables by default.</p>
         </div>
         <div class="subsection">
           <h4>Delete a link</h4>
