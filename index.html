@@ -641,6 +641,71 @@
         </div>
       </div>
       <div class="section">
+        <h3>Tun and Tap devices</h3>
+        <hr />
+	<p>Tun and tap devices allow userspace programs to emulate a network
+	   device.  When the userspace program opens them they get a file
+	   descriptor.  Packets routed by the kernel networking stack to the
+	   device are read from the file descriptor, data the userspace
+	   program writes to the file descriptor are injected as local
+	   outgoing packets into the networking stack.  The difference between
+	   the two is:
+	</p>
+	<ul>
+	  <li>tun - Sends and receives raw Ethernet frames.</li>
+	  <li>tun - Sends and receives raw IP packets.</li>
+	</ul>
+	<p>The commands listed here manipulate persistent tun/tap devices.
+	   There is another sort. Transient tun/tap devices are created by the
+	   by the userspace program when they open a special device, and are
+	   destroyed automatically when the returned file description is
+	   closed.
+	</p>
+        <div class="subsection">
+          <h4>Add an tun/tap device useable by root</h4>
+	  <pre>ip tuntap add dev ${interface name} mode ${mode}</pre>
+          <span>Examples:</span>
+          <pre>ip tuntap add dev tun0 mode tun</pre>
+          <pre>ip tuntap add dev tap9 mode tap</pre>
+        </div>
+        <div class="subsection">
+          <h4>Add an tun/tap device usable by an ordinary user</h4>
+	  <pre>ip tuntap add dev ${interface name} mode ${mode} user ${user} group ${group}</pre>
+          <span>Example:</span>
+          <pre>ip tuntap add dev tun1 mode tun user me group mygroup</pre>
+          <pre>ip tuntap add dev tun2 mode tun user 1000 group 1001</pre>
+        </div>
+        <div class="subsection">
+          <h4>Add an tun/tap device using an alternate packet format</h4>
+	  <p>Add meta information to each packet receive over the file
+	     descriptor.  Very few programs expect this information, and
+	     including it when it isn't expected will break things.
+	  </p>
+	  <pre>ip tuntap add dev ${interface name} mode ${mode} pi</pre>
+          <span>Example:</span>
+          <pre>ip tuntap add dev tun1 mode tun pi</pre>
+        </div>
+        <div class="subsection">
+          <h4>Add an tun/tap ignoring flow control</h4>
+	  <p>Normally packets are sent tun/tap device travel in the same way
+	     as every other device: they are put on a queue handled by the
+	     traffic control engine (which is configured by the tc command).  
+	     This can be bypassed, thus disabling the traffic control engine
+	     for this tun/tap device.
+	  </p>
+	  </p>
+	  <pre>ip tuntap add dev ${interface name} mode ${mode} one_queue</pre>
+          <span>Example:</span>
+          <pre>ip tuntap add dev tun1 mode tun one_queue</pre>
+        </div>
+        <div class="subsection">
+          <h4>Delete tun/tap device</h4>
+          <pre>ip tuntap del dev ${interface name}</pre>
+          <span>Examples:</span>
+          <pre>ip tuntap del dev tun0 name}</pre>
+        </div>
+      </div>
+      <div class="section">
         <h3>Neighbor (ARP and NDP) tables management</h3>
         <p>For ladies and gentlemen who prefer UK spelling, this command family supports "neighbour" spelling too.</p>
         <hr />
