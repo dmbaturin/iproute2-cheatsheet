@@ -154,23 +154,29 @@
           <span>Examples:</span>
           <pre>ip address add 192.0.2.10/27 dev eth0</pre>
           <pre>ip address add 2001:db8:1::/48 dev tun10</pre>
-          <p>You can add as many addresses as you want. The first address will be primary
-             and will be used as source address by default.</p>
+          <p>You can add as many addresses as you want.</p>
+          <p>If you add more than one address, your machine will accept packets for
+             all of them. The first address you added will be used as source address for
+             outgoing traffic by default, it's often referred to as primary address.</p>
         </div>
         <div class="subsection">
           <h4>Add an address with human-readable description</h4>
           <pre>ip address add ${address}/${mask} dev ${interface name} label ${interface name}:${description} </pre>
           <span>Examples:</span>
           <pre>ip address add 192.0.2.1/24 dev eth0 label eth0:my_wan_address</pre>
-          <span>Interface name with a colon before label is required, some backwards compaibility issue.</span>
+          <span>A label must start with the interface name followed by a colon due to some backwards compatibility issues,
+                otherwise you'll get an error.</span>
+          <h4>Notes</h4>
+          <p>For IPv6 addresses this command has no effect (address will be added, but without a label).</p>
         </div>
         <div class="subsection">
           <h4>Delete an address</h4>
           <pre>ip address delete ${address}/${prefix} dev ${interface name}</pre>
           <span>Examples:</span>
           <pre>ip address delete 192.0.2.1/24 dev eth0</pre>
-          <span>Interface name argument is required. Linux does allow to use the same address on multiple
-                interfaces and it has valid use cases.</span>
+          <pre>ip address delete 2001:db8::1/64 dev tun1</pre>
+          <span>Interface name is required. Linux does allow the same address to be configured on multiple interfaces
+                and it has valid use cases.</span>
         </div>
         <div class="subsection">
           <h4>Remove all addresses from an interface</h4>
@@ -179,6 +185,8 @@
           <pre>ip address flush dev eth1</pre>
         </div> 
         <div class="subsection">
+          <p>By default this command removes both IPv4 and IPv6 addresses. If you want to remove only
+             IPv4 or IPv6 addresses, use &ldquo;ip -4 address flush&rdquo; or &ldquo;ip -6 address flush&rdquo;.</p>
           <h4>Notes</h4> <br/>
           <span>Note that there is no way to rearrange addresses and replace the primary address.
                 Make sure you set the primary address first.</span>
@@ -188,8 +196,7 @@
       <div class="section">
         <h3>Route management</h3>
         <hr />
-        <p>In this section ${address} refers to subnet address in dotted decimal format, and
-           ${mask} refers to subnet mask either in prefix length or dotted decimal format.
+        <p>For IPv4 routes, you can use either a prefix length or a dotted decimal subnet mask.
            That is, both 192.0.2.0/24 and 192.0.2.0/255.255.255.0 are equally acceptable.</p>
         <p><strong>Note:</strong> as per the section below, if you set up a static route,
            and it becomes useless because the interface goes down, it will be removed and
@@ -197,17 +204,19 @@
            because in many cases additional software (e.g. NetworkManager or rp-pppoe)
            takes care of restoring routes associated with interfaces.</p>
         <p>If you are going to use your Linux machine as a router, consider installing
-           a routing protocol stack suite like <a href="http://quagga.net">Quagga</a>
-           or <a href="http://bird.network.cz">BIRD</a>. They serve as routing control plane,
-           keeping configured routes and restoring them after link failures properly in general case, 
-           and also providing dynamic routing protocol (e.g. OSPF and BGP) functionality.</p>
+           a routing protocol suite such as <a href="http://quagga.net">Quagga</a>
+           or <a href="http://bird.network.cz">BIRD</a>. They keep track of interface status
+           and restore routes when a link goes up after going down. Of course they also allow you
+           to use dynamic routing protocols such as OSPF and BGP.</p>
         <div class="subsection">
           <h4>Connected routes</h4>
-          <p>Some routes appear in the system without explicit configuration (against your will). </p>
-          <p>Once you assign an address to an interface, a route to the subnet it belongs
-             is automatically created via the interface you assigned it too. This is exactly
-             the reason "ip address add" command wants subnet mask, otherwise the system would
-             be unable to find out its subnet address and create connected routes properly.</p>
+          <p>Some routes appear in the system without explicit configuration (against your will).</p>
+          <p>Once you assign an address to an interface, the system calculates its network address
+             and creates a route to it (this is why the subnet mask is required). These routes are
+             called connected routes.</p>
+          <p>For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network
+             will be created and the system will know that hosts from that network can be reached
+             directly.</p>
           <p>When an interface goes down, connected routes associated with it are removed.
              This is used for inaccessible gateway detection so routes through gateways that
              went inaccessible are removed. Same mechanism prevents you from creating 
@@ -217,14 +226,14 @@
           <h4>View all routes</h4>
           <pre>ip route</pre>
           <pre>ip route show</pre>
-          <span>Show commands accept -4 and -6 options to view only IPv4 or IPv6 routes. 
+          <span>You can use -4 and -6 options to view only IPv4 or IPv6 routes. 
                  If no options given, IPv4 routes are displayed. To view IPv6 routes, use:</span>
           <pre>ip -6 route</pre>
         </div>
         <div class="subsection">
           <h4>View routes to a network and all its subnets</h4>
           <pre>ip route show to root ${address}/${mask}</pre>
-          <span>For example, if you use 192.168.0.0/24 subnet in a part of your network
+          <span>For example, if you use 192.168.0.0/24 subnet in your network
                 and it's broken into 192.168.0.0/25 and 192.168.0.128/25, you can see
                 all those routes with:</span>
           <pre>ip route show to root 192.168.0.0/24</pre>
@@ -237,7 +246,7 @@
                 use:</span>
           <pre>ip route show to match 192.168.0.0/24</pre>
           <span>As routers prefer more specific routes to less specific,
-                this is often useful for debugging in situations when traffic to a specific
+                this is often useful for debugging in situations when traffic to specific
                 subnet is sent the wrong way because a route to it is missing
                 but routes to larger subnets exist.</span>
         </div>
@@ -357,7 +366,7 @@
           <p>If there are several routes to the same network with different metric value,
                 the one with <strong>the lowest</strong> metric will be preferred.</p>
           <p>Important part of this concept is that when an interface goes down, routes
-                that would be rendered useless by this event disappear from the routing table (see "Connected Routes" section), and
+                that would be rendered useless by this event disappear from the routing table (see the <a href="#Connected routes">Connected Routes</a> section), and
                 the system will fall back to higher metric routes.</p>
           <p>This feature is commonly used to implement backup connections to important destinations.</p>
         </div>
@@ -379,13 +388,15 @@
         <h3>Link management</h3>
         <hr />
         <p>Link is another name for network interface. Commands from "ip link" family perform operations
-           that are common for all interface types, like viewing link information or setting MTU.</p>
+           that are common for all interface types, like viewing link information or changing the MTU.</p>
         <p>They also can create many types of interfaces, except for tunnel (IPIP, GRE etc.) and L2TPv3
             pseudowires that have their own commands.</p>
         <p>Note that interface name you set with "name ${name}" parameter of "ip link add" and "ip link set"
-           commands may be arbitrary, and even contain unicode characters. It's better however to stick with
-           ASCII because other programs may not handle unicode correctly. Also it's better to use a consistent
-           convention for link names, and use link aliases to provide human descriptions.</p>
+           commands may be arbitrary, and may even contain unicode characters. However, it's better to stick with
+           ASCII because other programs may not handle unicode correctly.</p>
+        <p>Also note that other programs, such as iptables, may have their own link name format and length
+           restrictions, so it's better to use short alphanumeric names, and provide additional information in
+           <a href="#Set human-readable link description">link aliases</a>.</p>
         <div class="subsection">
           <h4>Show information about all links</h4>
           <pre>ip link show</pre>
