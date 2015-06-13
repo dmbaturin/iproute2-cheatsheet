@@ -780,7 +780,7 @@
           <h4>Create an IPIP tunnel</h4>
           <pre>ip tunnel add ${interface name} mode ipip local ${local endpoint address} remote ${remote endpoint address}</pre>
           <span>Examples:</span>
-          <pre>ip runnel add tun0 mode ipip local 192.0.2.1 remote 198.51.100.3</pre>
+          <pre>ip tunnel add tun0 mode ipip local 192.0.2.1 remote 198.51.100.3</pre>
           <pre>ip link set dev tun0 up</pre>
           <pre>ip address add 10.0.0.1/30 dev tun0</pre>
         </div>
