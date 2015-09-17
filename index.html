@@ -94,20 +94,20 @@
         <p>Note that iproute2 has been a <strong>standard Linux tool</strong> since the early 2000's. It's included in
            every distro by default, or at least available from the repos (OpenWRT is one of the cases).</p>
         <p>iproute2 was originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger.</p>
-        <p>This document aims to provide comprehensive but easy to use documentation for the "ip" command
+        <p>This document aims to provide comprehensive but easy to use documentation for the ip command
            included in iproute2 package. There are more, such as ss (netstat replacement, fairly straightforward),
            tc (QoS management), but documenting them in this style, especially tc, would be a separate big project.</p>
         <p>Instead of listing commands and describing what they do, it lists common tasks network administrators
-           need to perform and gives commands to solve them, hence the "cheatsheet".</p>
-        <p>Contributions are always welcome, you can find the "source code" at
+           need to perform and gives commands to solve them, hence cheatsheet.</p>
+        <p>Contributions are always welcome, you can find the &ldquo;source code&rdquo; at
            <a href="https://github.com/dmbaturin/iproute2-cheatsheet">github.com/dmbaturin/iproute2-cheatsheet</a>.</p>
-        <p>This document is provided "as is", without any warranty. The authors are not liable for any
+        <p>This document is provided &ldquo;as is&rdquo;, without any warranty. The authors are not liable for any
            damage related to using it.</p>
 
         <h3>General notes</h3>
         <p>All commands that change any settings (that is, not just display them) require root privileges.</p>
         <p>There are configuration files in /etc/iproute2, mainly for assinging symbolic names to network
-           stack entities such as routing tables. Those files are re-read at every "ip" call and you don't need
+           stack entities such as routing tables. Those files are re-read every time you run the ip command and you don't need
            to do anything to apply the changes.</p>
 
         <h3>Typographic conventions</h3>
@@ -124,12 +124,12 @@
         <p>In this section ${address} value should be a host address in dotted decimal format, and
            ${mask} can be either a dotted decimal subnet mask or a prefix length.
            That is, both 192.0.2.10/24 and 192.0.2.10/255.255.255.0 are equally acceptable.</p>
-         <p> If you are not sure if something is a correct host address, use "ipcalc" or similar
+         <p> If you are not sure if something is a correct host address, use ipcalc or similar
              program to check.</p>
         <div class="subsection">
           <h4>Show all addresses</h4>
           <pre>ip address show</pre>
-          <span>All "show" commands can be used with "-4" or "-6" options to show only IPv4 or IPv6 addresses.</span>
+          <span>All show commands can be used with -4 or -6 options to show only IPv4 or IPv6 addresses.</span>
         </div>
         <div class="subsection">
           <h4>Show addresses for a single interface</h4>
