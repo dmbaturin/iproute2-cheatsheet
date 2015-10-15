@@ -271,7 +271,7 @@
           <span>Note that in complex routing scenarios like multipath routing,
                 the result may be "correct but not complete", as it always shows
                 one route that will be used first. In most situations it's not
-                a problem, but never forget to look at the corresponsing "show" command
+                a problem, but never forget to look at the corresponding "show" command
                 output too.</span>
         </div>
         <div class="subsection">
@@ -468,7 +468,7 @@
              (frames up to 9000 bytes large). If all your equipment
              supports gigabit ethernet, you may want to do something like
           <pre>ip link set dev eth0 mtu 9000</pre>
-          <p>Note that you may need to configure it on your L2 swithces too,
+          <p>Note that you may need to configure it on your L2 switches too,
              some of them have it disables by default.</p>
         </div>
         <div class="subsection">
@@ -559,7 +559,7 @@
              transparently between ethernet interfaces, and, increasingly common, as ethernet switches
              for virtual machines running inside hypervisors.</p>
           <p>You can assign an IP address to a bridge and it will be visible from all bridge ports.</p>
-          <p>If this command failes, check if "bridge" module is loaded.</p>
+          <p>If this command fails, check if "bridge" module is loaded.</p>
         </div>
         <div class="subsection">
           <h4>Add an interface to bridge</h4>
@@ -821,7 +821,7 @@
           <pre>ip link add ${interface name} type gretap local ${local endpoint address} remote ${remote endpoint address}</pre>
           <span>Examples:</span>
           <pre>ip link add gretap0 type gretap local 192.0.2.1 remote 203.0.113.3</pre>
-          <p>This type of tunnels encapculates ethernet frames into IPv4 packets.</p>
+          <p>This type of tunnels encapsulates ethernet frames into IPv4 packets.</p>
           <p>Recent kernel and iproute2 versions also support gretap over IPv6, you need to replace the mode with "ip6gretap"
              to create an IPv6-based link.</p>
           <p>This probably should have been in "Links management" section, but as it involves encapsulation, it's here.
@@ -918,7 +918,7 @@ tun99: gre/ip  remote 10.46.1.20  local 10.91.19.110  ttl inherit
            multiple sessions with different identifiers to the same tunnel. Virtual network interfaces
            (by default named l2tpethX) are associated with <em>sessions</em>.</p>
         <p> <strong>Note:</strong> Linux kernel implements only handling of data frames, so you can create
-            only unmaged tunnels with iproute2, with all settings configured manually on both sides.
+            only unmanaged tunnels with iproute2, with all settings configured manually on both sides.
             If you want to use L2TP for remote access VPN or something else other than fixed
             pseudowire, you need a userspace daemon to handle it. This is outside of this document scope.</p>
         <div class="subsection">
@@ -1020,7 +1020,7 @@ tunnel_id ${tunnel identifier}
           <dt> <strong>main</strong> (table 254)</dt>
           <dd>Contains all non-PBR routes. If you don't specify the table when adding a route, it goes here.</dd>
           <dt> <strong>default</strong> (table 253)</dt>
-          <dd> Reserved for postprocessing, normally unused.</dd>
+          <dd> Reserved for post processing, normally unused.</dd>
         </dl>
         <p>User-defined tables are created automatically when you add the first route to them.</p>
         <div class="subsection">
@@ -1044,7 +1044,7 @@ tunnel_id ${tunnel identifier}
           <span>Examples:</span>
           <pre>ip route show table 100</pre>
           <pre>ip route show table test</pre>
-          <p> <strong>Note:</strong> in this case you need the "show" word, the shortands like "ip route table 120"
+          <p> <strong>Note:</strong> in this case you need the "show" word, the shorthand like "ip route table 120"
               do not work because the command would be ambiguous.</p>
         </div>
         <div class="subsection">
@@ -1063,7 +1063,7 @@ tunnel_id ${tunnel identifier}
           <span>Examples:</span>
           <pre>ip rule add from 192.0.2.0/24 lookup 10</pre>
           <pre>ip -6 rule add from 2001:db8::/32 prohibit</pre>
-          <p><strong>Notes:</strong> "all" can be used as shortand to 0.0.0.0/0 or ::/0</p>
+          <p><strong>Notes:</strong> "all" can be used as shorthand to 0.0.0.0/0 or ::/0</p>
         </div>
         <div class="subsection">
           <h4>Create a rule to match a destination network</h4>
@@ -1128,7 +1128,7 @@ tunnel_id ${tunnel identifier}
           <h4>Delete all rules</h4>
           <pre>ip rule flush</pre>
           <pre>ip -6 rule flush</pre>
-          <p><strong>Notes:</strong> this operation is <strong>highly disruprive</strong>. Even if you have not
+          <p><strong>Notes:</strong> this operation is <strong>highly disruptive</strong>. Even if you have not
              configured any rules, "from all lookup main" rules are initialized by default. On an unconfigured
              machine you can see this:</p>
 <pre>
