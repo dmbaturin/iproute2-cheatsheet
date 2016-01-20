@@ -1267,10 +1267,11 @@ $ ip -6 rule show
           <pre>   id &lt;0-16777215&gt; \ </pre>
           <pre>   dev ${source interface}\ </pre>
           <pre>   remote ${remote endpoint address} \ </pre>
-          <pre>   local ${local endpoint address} </pre>
+          <pre>   local ${local endpoint address} \ </pre>
+          <pre>   dstport ${VXLAN destination port} </pre>
           <span>Example:</span>
           <pre>ip link add name vxlan0 type vxlan \ </pre>
-          <pre>   id 42 dev eth0 remote 203.0.113.6 source 192.0.2.1 </pre>
+          <pre>   id 42 dev eth0 remote 203.0.113.6 local 192.0.2.1 dstport 4789 </pre>
           <p><strong>Note:</strong> id options means VXLAN Network Identifier (VNI).</p>
         </div>
         <div class="subsection">
@@ -1278,10 +1279,11 @@ $ ip -6 rule show
           <pre>ip link add name ${interface name} type vxlan \ </pre>
           <pre>   id &lt;0-16777215&gt; \ </pre>
           <pre>   dev ${source interface} \ </pre>
-          <pre>   group ${multicast address </pre>
+          <pre>   group ${multicast address} \ </pre>
+          <pre>   dstport ${VXLAN destination port} </pre>
           <span>Example:</span>
           <pre>ip link add name vxlan0 type vxlan \ </pre>
-          <pre>   id 42 dev eth0 group 239.0.0.1 </pre>
+          <pre>   id 42 dev eth0 group 239.0.0.1 dstport 4789 </pre>
           <p>After that you need to bring the link up and either bridge it with
              another interface or assign an address.</p>
         </div>
