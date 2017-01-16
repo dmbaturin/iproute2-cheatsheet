@@ -318,7 +318,7 @@
           <pre>ip route add default via ${address}/${mask}</pre>
           <pre>ip route add default dev ${interface name}</pre>
           <span>These are equivalent to:</span>
-          <pre>ip route add 0.0.0.0/0 ${address}/${mask}</pre>
+          <pre>ip route add 0.0.0.0/0 via ${address}/${mask}</pre>
           <pre>ip route add 0.0.0.0/0 dev ${interface name}</pre>
           <span>With IPv6 routes it also works and is equivalent to ::/0</span>
           <pre>ip -6 route add default via 2001:db8::1</pre>
