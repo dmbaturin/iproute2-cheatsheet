@@ -1,6 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<!DOCTYPE html>
+<html>
   <head>
     <title>iproute2 cheat sheet</title>
     <style type="text/css">
@@ -10,6 +9,7 @@
 	a { color: #09F; margin: 0px; padding: 0px; vertical-align: baseline;}
 	li { line-height: 24px; margin-left: 44px;}
 	ul, ol { font-size: 14px; line-height: 20px;}
+
 	h3 { font-size: 21px;}
 	
       .wrapper { width: 800px; margin: 20px auto; }
@@ -44,14 +44,14 @@
         body {color: black}
         a { color: #222;  text-decoration: none;}
         
-        a:after{content:" " attr(href) " ";font-weight:normal; text-decoration: underline;}
+        a:after{content:" " attr(href) " ";font-weight:normal; text-decoration: underline; }
         
         
         #toc a { text-decoration: none; color:black }
         #toc a:after, .none {content:""}
         
         .wrapper { width: auto; margin: 0; }
-        .section {
+        .contributors, .section {
             border: 0;
             page-break-before: always;
             width: auto;
@@ -65,6 +65,13 @@
             padding: 1em 0 1em
             }
 
+    	li {page-break-inside: avoid;}
+    	
+    	
+        .copyright {
+            text-align: left;
+        }
+    	
     }
        
     </style>
