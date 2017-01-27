@@ -2,6 +2,8 @@
 <html>
   <head>
     <title>iproute2 cheat sheet</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1">
     <style type="text/css">
 	body {font: 13px/1 Helvetica,Arial,sans-serif; color: #444; }
 	h1, h2, h3, h4, h5 { margin: 1em 0 1em; padding: 0;}
@@ -37,8 +39,6 @@
     
     p, span {text-align:justify;}
     
-    .none { display: none}
-    
     @media print {
         
         body {color: black}
@@ -48,7 +48,7 @@
         
         
         #toc a { text-decoration: none; color:black }
-        #toc a:after, .none {content:""}
+        #toc a:after {content:""}
         
         .wrapper { width: auto; margin: 0; }
         .contributors, .section {
@@ -69,10 +69,28 @@
     	
     	
         .copyright {
-            text-align: left;
+            text-align: left; /* dont know how to pull it down, lets look like contributers */
         }
+        
+        #toc { page-break-before: always; }
+        
+        #toc:before { content:"Table of Contents:"; font-size: 120%; }
+
+      
+      }
     	
+        
+    @media only screen and (max-device-width: 800px) {
+         .wrapper { width: auto; margin: auto; }
+        li {    margin-left:0;}
+        .contributors, .section {
+        border: 0;
+        padding-left:0;
+        padding-right:0;
+        }
+        
     }
+   
        
     </style>
     <script type="text/javascript">
