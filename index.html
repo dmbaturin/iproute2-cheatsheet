@@ -242,7 +242,7 @@
           <pre>ip address add 192.0.2.1/24 dev eth0 label eth0:WANaddress</pre>
           <span>A label must start with the interface name followed by a colon due to some backwards compatibility issues,
                 otherwise you'll get an error.</span>
-          <span>Keep label shorter then sixteen characters to avoid the error</span>
+          <span>Keep the label shorter than sixteen characters, or else you'll get this error:</span>
           <pre>RTNETLINK answers: Numerical result out of range</pre>
           <h4>Notes</h4>
           <p>For IPv6 addresses this command has no effect (address will be added, but without a label).</p>
