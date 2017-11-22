@@ -233,7 +233,8 @@
           <p>You can add as many addresses as you want.</p>
           <p>If you add more than one address, your machine will accept packets for
              all of them. The first address you added will be used as source address for
-             outgoing traffic by default, it's often referred to as primary address.</p>
+             outgoing traffic by default, it's referred to as primary address.</p>
+          <p>All additional addresses you set will become secondary addresses.</p>
         </div>
         <div class="subsection">
           <h4>Add an address with human-readable description</h4>
@@ -265,9 +266,14 @@
         <div class="subsection">
           <p>By default this command removes both IPv4 and IPv6 addresses. If you want to remove only
              IPv4 or IPv6 addresses, use &ldquo;ip -4 address flush&rdquo; or &ldquo;ip -6 address flush&rdquo;.</p>
-          <h4>Notes</h4> <br/>
-          <span>Note that there is no way to rearrange addresses and replace the primary address.
-                Make sure you set the primary address first.</span>
+          <h4>Notes</h4>
+          <p>There is no way to swap primary and secondary addresses or explicitly set the new primary address. Try to always set the primary address first.</p>
+          <p>However, if the sysctl variable net.ipv4.conf.${interface}.promote_secondaries is set to 1, when you delete the primary address,
+             the first secondary address will become the new primary.</p>
+          <p>Note that net.ipv4.conf.default.promote_secondaries=1 is <em>not</em> the universal default setting in all Linux distributions,
+             so check yours before trying it. If it's set to 0, then when you delete the primary address, <em>all</em> addresses will be removed
+             from the interface.</p>
+          <p>Secondary IPv6 addresses are always promoted to primary if the primary address is deleted so you don't need to worry about sysctl settings.</p>
         </div>
       </div>
 
@@ -1444,7 +1450,8 @@ $ ip -6 rule show
         <p>Content:
              Nicolas Dichtel,
              Russel Stuart,
-             Roan Huang.
+             Roan Huang,
+             Emil Pederson (promote_secondaries suggestion).
 	</p>
         <p>Grammar, style, typo fixes:
              Trick van Staveren,
@@ -1468,7 +1475,7 @@ $ ip -6 rule show
                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
 	</a><br />
         <br />
-        <span>Last modified: 2017 Feb 10.</span>
+        <span>Last modified: 2017 Nov 23.</span>
       </div>
     </div>
   </body>
