@@ -750,14 +750,21 @@
 	  <li>tap sends and receives raw Ethernet frames.</li>
 	  <li>tun sends and receives raw IP packets.</li>
 	</ul>
-	<p>The commands listed here manipulate persistent tun/tap devices.
-	   There is another sort. Transient tun/tap devices are created by the
-	   userspace program when they open a special device, and are destroyed
-	   automatically when the associated file descriptor is closed.
+	<p>
+           There are two types of tun/tap devices: persistent and transient.
+           Transient tun/tap devices are created by userspace programs when they open a special device, and are destroyed
+           automatically when the associated file descriptor is closed.
+           The commands listed here manipulate persistent devices.
 	</p>
         <div class="subsection">
-          <h4>Add an tun/tap device useable by root</h4>
-	  <pre>ip tuntap add dev ${interface name} mode ${mode}</pre>
+          <h4>View tun/tap devices</h4>
+          <pre>ip tuntap show</pre>
+          <p><strong>Note:</strong> this command can be abbreviated to "ip tuntap".</p>
+          <p>This command is the only way to find out if some device is in tun or tap mode.</p>
+        </div>
+        <div class="subsection">
+          <h4>Add an tun/tap device useable by the root user</h4>
+          <pre>ip tuntap add dev ${interface name} mode ${mode}</pre>
           <span>Examples:</span>
           <pre>ip tuntap add dev tun0 mode tun</pre>
           <pre>ip tuntap add dev tap9 mode tap</pre>
@@ -794,9 +801,12 @@
         </div>
         <div class="subsection">
           <h4>Delete tun/tap device</h4>
-          <pre>ip tuntap del dev ${interface name}</pre>
+          <pre>ip tuntap del dev ${interface name} mode ${mode}</pre>
           <span>Examples:</span>
-          <pre>ip tuntap del dev tun0</pre>
+          <pre>ip tuntap delete dev tun0 mode tun</pre>
+          <pre>ip tuntap delete dev tap1 mode tap</pre>
+          <p><strong>Note:</strong> you must specify the mode. The mode is not displayed in "ip link show", so
+             if you don't know if it's TUN or TAP, consult the output of "ip tuntap show".</p>
         </div>
       </div>
       <div class="section">
@@ -1451,7 +1461,8 @@ $ ip -6 rule show
              Nicolas Dichtel,
              Russel Stuart,
              Roan Huang,
-             Emil Pederson (promote_secondaries suggestion).
+             Emil Pederson (promote_secondaries suggestion),
+             Nick B. (tuntap deletion command correction).
 	</p>
         <p>Grammar, style, typo fixes:
              Trick van Staveren,
