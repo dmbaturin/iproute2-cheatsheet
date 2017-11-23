@@ -98,7 +98,23 @@
     <script type="text/javascript">
     //<![CDATA[
 
-      function expand(id) { document.getElementById(id).display = "" }
+      function expand_toc()
+      {
+          var subsections = document.getElementsByClassName('subsection-toc');
+          for(var i=0;i<subsections.length; i+=1)
+          {
+              subsections[i].style.display = "";
+          }
+      }
+
+      function collapse_toc()
+      {
+          var subsections = document.getElementsByClassName('subsection-toc');
+          for(var i=0;i<subsections.length; i+=1)
+          {
+              subsections[i].style.display = "none";
+          }
+      }
 
       // Generate table of contents
       // Only two levels
@@ -130,6 +146,11 @@
 
               var subsections = sections[i].getElementsByClassName('subsection');
               var subsection_toc = document.createElement('ol');
+
+              // Make subsection ToC'es hidden by default
+              subsection_toc.className = "subsection-toc";
+              subsection_toc.style.display = "none";
+
               for(j=0;j<subsections.length;j+=1)
               {
 
@@ -189,6 +210,13 @@
         <h3>Typographic conventions</h3>
         <p>Metasyntactic variables are written in shell-style syntax, ${something}. Optional command parts are in
            square brackets.</p>
+
+        <h3>Table of contents</h3>
+
+        <form>
+          <input type="button" onclick="expand_toc()" value="Expand table of contents"/>
+          <input type="button" onclick="collapse_toc()" value="Collapse table of contents"/>
+        </form>
 
         <ol id="toc">
 
