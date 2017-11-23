@@ -347,8 +347,9 @@
         <hr />
         <p>Link is another term for a for network interface. Commands from the "ip link" family perform operations
            that are common for all interface types, like viewing link information or changing the MTU.</p>
-        <p>They can also create many types of interfaces, except for tunnels (IPIP, GRE etc.), L2TPv3, VXLAN, and FOU
-            interfaces that have their own commands.</p>
+        <p>Historically "ip link" commands could create all types of interfaces, except for tunnels (IPIP, GRE etc.), L2TPv3, and VXLAN
+            interfaces that have their own commands. In newer iproute2 versions (since at least 3.16) they can create interfaces of all
+            types except L2TPv3, though using special command families for some of them is more convenient.</p>
         <p>Note that interface name you set with "name ${name}" parameter of "ip link add" and "ip link set"
            commands may be arbitrary, and may even contain unicode characters. However, it's better to stick with
            ASCII because other programs may not handle unicode correctly.</p>
