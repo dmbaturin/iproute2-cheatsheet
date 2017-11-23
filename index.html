@@ -276,205 +276,51 @@
           <p>Secondary IPv6 addresses are always promoted to primary if the primary address is deleted so you don't need to worry about sysctl settings.</p>
         </div>
       </div>
-
       <div class="section">
-        <h3>Route management</h3>
+        <h3>Neighbor (ARP and NDP) table management</h3>
         <hr />
-        <p>For IPv4 routes, you can use either a prefix length or a dotted decimal subnet mask.
-           That is, both 192.0.2.0/24 and 192.0.2.0/255.255.255.0 are equally acceptable.</p>
-        <p><strong>Note:</strong> as per the section below, if you set up a static route,
-           and it becomes useless because the interface goes down, it will be removed and
-           <strong>never get back on its own</strong>. You may not have noticed this behaviour
-           because in many cases additional software (e.g. NetworkManager or rp-pppoe)
-           takes care of restoring routes associated with interfaces.</p>
-        <p>If you are going to use your Linux machine as a router, consider installing
-           a routing protocol suite such as <a href="http://quagga.net">Quagga</a>
-           or <a href="http://bird.network.cz">BIRD</a>. They keep track of interface status
-           and restore routes when a link goes up after going down. Of course they also allow you
-           to use dynamic routing protocols such as OSPF and BGP.</p>
+        <p>For ladies and gentlemen who prefer the British spelling, this command family supports the "neighbour" spelling too.</p>
         <div class="subsection">
-          <h4>Connected routes</h4>
-          <p>Some routes appear in the system without explicit configuration (against your will).</p>
-          <p>Once you assign an address to an interface, the system calculates its network address
-             and creates a route to it (this is why the subnet mask is required). These routes are
-             called connected routes.</p>
-          <p>For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network
-             will be created and the system will know that hosts from that network can be reached
-             directly.</p>
-          <p>When an interface goes down, connected routes associated with it are removed.
-             This is used for inaccessible gateway detection so routes through gateways that
-             went inaccessible are removed. Same mechanism prevents you from creating 
-             routes through inaccessible gateways.</p>
+          <h4>View neighbor tables</h4>
+          <pre>ip neighbor show</pre>
+          <p>All "show" commands support -4 and -6 options to view only IPv4 (ARP) or IPv6 (NDP) neighbors. By default
+             all neighbors are displayed.</p>
         </div>
         <div class="subsection">
-          <h4>View all routes</h4>
-          <pre>ip route</pre>
-          <pre>ip route show</pre>
-          <span>You can use -4 and -6 options to view only IPv4 or IPv6 routes. 
-                 If no options given, IPv4 routes are displayed. To view IPv6 routes, use:</span>
-          <pre>ip -6 route</pre>
-        </div>
-        <div class="subsection">
-          <h4>View routes to a network and all its subnets</h4>
-          <pre>ip route show to root ${address}/${mask}</pre>
-          <span>For example, if you use 192.168.0.0/24 subnet in your network
-                and it's broken into 192.168.0.0/25 and 192.168.0.128/25, you can see
-                all those routes with:</span>
-          <pre>ip route show to root 192.168.0.0/24</pre>
-          <span>Note: the word "to" in this and other show commands is optional.</span>
-        </div>
-        <div class="subsection">
-          <h4>View routes to a network and all supernets</h4>
-          <pre>ip route show to match ${address}/${mask}</pre>
-          <span>If you want to view routes to 192.168.0.0/24 and all larger subnets,
-                use:</span>
-          <pre>ip route show to match 192.168.0.0/24</pre>
-          <span>As routers prefer more specific routes to less specific,
-                this is often useful for debugging in situations when traffic to specific
-                subnet is sent the wrong way because a route to it is missing
-                but routes to larger subnets exist.</span>
-        </div>
-        <div class="subsection">
-          <h4>View routes to exact subnet</h4>
-          <pre>ip route show to exact ${address}/${mask}</pre>
-          <span>If you want to see the routes to 192.168.0.0/24, but not to,
-                say 192.168.0.0/25 and 192.168.0.0/16, you can use:</span>
-          <pre>ip route show to exact 192.168.0.0/24</pre>
-        </div>
-        <div class="subsection">
-          <h4>View only the route actually used by the kernel</h4>
-          <pre>ip route get ${address}/${mask}</pre>
-          <span>Example:</span>
-          <pre>ip route get 192.168.0.0/24</pre>
-          <span>Note that in complex routing scenarios like multipath routing,
-                the result may be "correct but not complete", as it always shows
-                one route that will be used first. In most situations it's not
-                a problem, but never forget to look at the corresponding "show" command
-                output too.</span>
-        </div>
-        <div class="subsection">
-          <h4>View route cache (pre 3.6 kernels only)</h4>
-          <pre>ip route show cached</pre>
-          <span>Until the version 3.6, Linux used
-                route caching. In older kernels, this command displays the contents
-                of the route cache. It can be used with modifiers
-                described above. In newer kernels it does nothing.</span>
-        </div>
-        <div class="subsection">
-          <h4>Add a route via gateway</h4>
-          <pre>ip route add ${address}/${mask} via ${next hop}</pre>
+          <h4>View neighbors for single interface</h4>
+          <pre>ip neighbor show dev ${interface name}</pre>
           <span>Examples:</span>
-          <pre>ip route add 192.0.2.128/25 via 192.0.2.1</pre>
-          <pre>ip route add 2001:db8:1::/48 via 2001:db8:1::1</pre>
+          <pre>ip neighbor show dev eth0</pre>
         </div>
         <div class="subsection">
-          <h4>Add a route via interface</h4>
-          <pre>ip route add ${address}/${mask} dev ${interface name}</pre>
-          <span>Example:</span>
-          <pre>ip route add 192.0.2.0/25 dev ppp0</pre>
-          <span>Interface routes are commonly used with point-to-point interfaces
-                like PPP tunnels where next hop address is not required.</span>
-        </div>
-        <div class="subsection">
-          <h4>Change or replace a route</h4>
-          <p>You may use "change" command to change parameters of existing routes.
-             "Replace" command can be used to add new route or modify existing one if
-             it doesn't exist. Examples:</p>
-          <pre>ip route change 192.168.2.0/24 via 10.0.0.1</pre>
-          <pre>ip route replace 192.0.2.1/27 dev tun0</pre> 
-        </div>
-        <div class="subsection">
-          <h4>Delete a route</h4>
-          <pre>ip route delete ${rest of the route statement}</pre>
+          <h4>Flush table for an interface</h4>
+          <pre>ip neighbor flush dev ${interface name}</pre>
           <span>Examples:</span>
-          <pre>ip route delete 10.0.1.0/25 via 10.0.0.1</pre>
-          <pre>ip route delete default dev ppp0</pre>
+          <pre>ip neighbor flush dev eth1</pre>
         </div>
         <div class="subsection">
-          <h4>Default route</h4> <br/>
-          <span>There is a shortcut to add default route.</span>
-          <pre>ip route add default via ${address}/${mask}</pre>
-          <pre>ip route add default dev ${interface name}</pre>
-          <span>These are equivalent to:</span>
-          <pre>ip route add 0.0.0.0/0 via ${address}/${mask}</pre>
-          <pre>ip route add 0.0.0.0/0 dev ${interface name}</pre>
-          <span>With IPv6 routes it also works and is equivalent to ::/0</span>
-          <pre>ip -6 route add default via 2001:db8::1</pre>
-        </div>
-        <div class="subsection">
-          <h4>Blackhole routes</h4>
-          <pre>ip route add blackhole ${address}/${mask}</pre>
+          <h4>Add a neighbor table entry</h4>
+          <pre>ip neighbor add ${network address} lladdr ${link layer address} dev ${interface name}</pre>
           <span>Examples:</span>
-          <pre>ip route add blackhole 192.0.2.1/32</pre>
-          <p>Traffic to destinations that match a blackhole route is silently discarded.</p>
-          <p>Blackhole routes have dual purpose. First one is straightforward, to discard traffic
-             sent to unwanted destinations, e.g. known malicious hosts.</p>
-          <p>The second one is less obvious and uses the "longest match rule" as per RFC1812.
-             In some cases you may want the router to think it has a route to a larger subnet,
-             while you are not using it as a whole,
-             e.g. when advertising the whole subnet via dynamic routing protocols. Large subnets
-             are commonly broken into smaller parts, so if your subnet is 192.0.2.0/24, and you
-             have assigned 192.0.2.1/25 and 192.0.2.129/25 to your interfaces, your system creates connected
-             routes to the /25's, but not the whole /24, and routing daemons may not want to 
-             advertise /24 because you have no route to that exact subnet. The solution is to setup
-             a blackhole route to 192.0.2.0/24. Because routes to smaller subnets are preferred
-             over larger subnets, it will not affect actual routing, but will convince routing
-             daemons there's a route to the supernet.</p>
+          <pre>ip neighbor add 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0</pre>
+          <p>One of the use cases for it is to add static entry for an interface with disabled ARP to
+             restrict interface usage only by hosts with specific MAC addresses.</p>
         </div>
         <div class="subsection">
-          <h4>Other special routes</h4>
-          <pre>ip route add unreachable ${address}/${mask}</pre>
-          <pre>ip route add prohibit ${address}/${mask}</pre>
-          <pre>ip route add throw ${address}/${mask}</pre>
-          <span>These routes make the system discard packets and reply with an ICMP error message to the sender.</span>
-          <dl>
-            <dt>unreachable</dt>
-            <dd>Sends ICMP "host unreachable".</dd>
-            <dt>prohibit</dt>
-            <dd>Sends ICMP "administratively prohibited".</dd>
-            <dt>throw</dt>
-            <dd>Sends "net unreachable".</dd>
-          </dl>
-          <p>Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g. DDoS)
-             because they generate a reply packet for every discarded packet and thus create even greater traffic flow.
-             They can be good for implementing internal access policies, but consider firewall for this purpose first.</p>
-          <p>"Throw" routes may be used for implementing policy-based routing, in non-default tables they
-             stop current table lookup, but don't send ICMP error messages.</p>
-        </div>
-        <div class="subsection">
-          <h4>Routes with different metric</h4>
-          <pre>ip route add ${address}/${mask} via ${gateway} metric ${number}</pre>
+          <h4>Delete a neighbor table entry</h4>
+          <pre>ip neighbor delete ${network address} lladdr ${link layer address} dev ${interface name}</pre>
           <span>Examples:</span>
-          <pre>ip route add 192.168.2.0/24 via 10.0.1.1 metric 5</pre>
-          <pre>ip route add 192.168.2.0 dev ppp0 metric 10</pre>
-          <p>If there are several routes to the same network with different metric value,
-                the one with <strong>the lowest</strong> metric will be preferred.</p>
-          <p>Important part of this concept is that when an interface goes down, routes
-                that would be rendered useless by this event disappear from the routing table (see the <a href="#Connected routes">Connected Routes</a> section), and
-                the system will fall back to higher metric routes.</p>
-          <p>This feature is commonly used to implement backup connections to important destinations.</p>
-        </div>
-        <div class="subsection">
-          <h4>Multipath routing</h4>
-          <pre>ip route add ${addresss}/${mask} nexthop via ${gateway 1} weight ${number} nexthop via ${gateway 2} weight ${number}</pre>
-          <p>Multipath routes make the system balance packets across several links according to the weight (higher weight is preferred, so
-             gateway/interface with weight of 2 will get roughly two times more traffic than another one with weight of 1). You can have as many gateways
-             as you want and mix gateway and interface routes, like:</p>
-          <pre>ip route add default nexthop via 192.168.1.1 weight 1 nexthop dev ppp0 weight 10</pre>
-          <p> <strong>Warning:</strong> the downside of this type of balancing is that packets are not guaranteed to be sent back
-             through the same link they came in. This is called "asymmetric routing". For routers that simply forward packets and don't
-             do any local traffic processing such as NAT, this is usually normal, and in some cases even unavoidable.</p>
-          <p>If your system does anything but forwarding packets between interfaces, this may cause problems with incoming connections
-             and some measures should be taken to prevent it.</p>
+          <pre>ip neighbor delete 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0</pre>
+          <p>Allows to delete a static entry, or get rid of an automatically learnt entry without flushing the table.</p>
         </div>
       </div>
       <div class="section">
         <h3>Link management</h3>
         <hr />
-        <p>Link is another name for network interface. Commands from "ip link" family perform operations
+        <p>Link is another term for a for network interface. Commands from the "ip link" family perform operations
            that are common for all interface types, like viewing link information or changing the MTU.</p>
-        <p>They also can create many types of interfaces, except for tunnel (IPIP, GRE etc.) and L2TPv3
-            pseudowires that have their own commands.</p>
+        <p>They can also create many types of interfaces, except for tunnels (IPIP, GRE etc.), L2TPv3, VXLAN, and FOU
+            interfaces that have their own commands.</p>
         <p>Note that interface name you set with "name ${name}" parameter of "ip link add" and "ip link set"
            commands may be arbitrary, and may even contain unicode characters. However, it's better to stick with
            ASCII because other programs may not handle unicode correctly.</p>
@@ -566,7 +412,7 @@
           <pre>ip link set ${interface name} arp off</pre>
           <p>One may want to disable ARP to enforce a security policy and allow only specific MACs
              to communicate with the interface. In this case neighbor table entries for whitelisted MACs
-             should be created manually (see <a href="#Neighbor (ARP and NDP) tables management">neighbor table management</a>
+             should be created manually (see <a href="#Neighbor (ARP and NDP) table management">neighbor table management</a>
              section), or nothing will be able to communicate with that interface. </p>
           <p>In most cases it's better to configure MAC policy on an access layer switch though.
              Do not change this flag unless you are sure what you are going to do and why.</p>
@@ -807,44 +653,6 @@
           <pre>ip tuntap delete dev tap1 mode tap</pre>
           <p><strong>Note:</strong> you must specify the mode. The mode is not displayed in "ip link show", so
              if you don't know if it's TUN or TAP, consult the output of "ip tuntap show".</p>
-        </div>
-      </div>
-      <div class="section">
-        <h3>Neighbor (ARP and NDP) tables management</h3>
-        <p>For ladies and gentlemen who prefer UK spelling, this command family supports "neighbour" spelling too.</p>
-        <hr />
-        <div class="subsection">
-          <h4>View neighbor tables</h4>
-          <pre>ip neighbor show</pre>
-          <p>All "show" commands support -4 and -6 options to view only IPv4 (ARP) or IPv6 (NDP) neighbors. By default
-             all neighbors are displayed.</p>
-        </div>
-        <div class="subsection">
-          <h4>View neighbors for single interface</h4>
-          <pre>ip neighbor show dev ${interface name}</pre>
-          <span>Examples:</span>
-          <pre>ip neighbor show dev eth0</pre>
-        </div>
-        <div class="subsection">
-          <h4>Flush table for an interface</h4>
-          <pre>ip neighbor flush dev ${interface name}</pre>
-          <span>Examples:</span>
-          <pre>ip neighbor flush dev eth1</pre>
-        </div>
-        <div class="subsection">
-          <h4>Add a neighbor table entry</h4>
-          <pre>ip neighbor add ${network address} lladdr ${link layer address} dev ${interface name}</pre>
-          <span>Examples:</span>
-          <pre>ip neighbor add 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0</pre>
-          <p>One of the use cases for it is to add static entry for an interface with disabled ARP to
-             restrict interface usage only by hosts with specific MAC addresses.</p>
-        </div>
-        <div class="subsection">
-          <h4>Delete a neighbor table entry</h4>
-          <pre>ip neighbor delete ${network address} lladdr ${link layer address} dev ${interface name}</pre>
-          <span>Examples:</span>
-          <pre>ip neighbor delete 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0</pre>
-          <p>Allows to delete a static entry, or get rid ot an automatically learnt entry without flushing the table.</p>
         </div>
       </div>
       <div class="section">
@@ -1096,6 +904,236 @@ tunnel_id ${tunnel identifier}
         </div>
       </div>
       <div class="section">
+        <h3>VXLAN management</h3>
+        <hr />
+        <p>VXLAN is a layer 2 tunneling protocol that is commonly used in conjunction with
+           virtualization systems such as KVM to connect virtual machines running on different
+           hypervisor nodes to each other and to outside world.</p>
+        <p>Unlike GRE or L2TPv3 that are point to point, VXLAN replicates some properties of
+           multiple access switched networks by using IP multicast. Also it supports virtual network
+           separation by transmitting a network identifier along with the frame.</p>
+        <p>The downside is that you will need to use a multicast routing protocol, typically PIM-SM,
+           to get it to work over routed networks.</p>
+        <p>The underlying encapsulation protocol for VXLAN is UDP.</p>
+        <div class="subsection">
+          <h4>Create unicast VXLAN link</h4>
+          <pre>ip link add name ${interface name} type vxlan \ </pre>
+          <pre>   id &lt;0-16777215&gt; \ </pre>
+          <pre>   dev ${source interface}\ </pre>
+          <pre>   remote ${remote endpoint address} \ </pre>
+          <pre>   local ${local endpoint address} \ </pre>
+          <pre>   dstport ${VXLAN destination port} </pre>
+          <span>Example:</span>
+          <pre>ip link add name vxlan0 type vxlan \ </pre>
+          <pre>   id 42 dev eth0 remote 203.0.113.6 local 192.0.2.1 dstport 4789 </pre>
+          <p><strong>Note:</strong> id options means VXLAN Network Identifier (VNI).</p>
+        </div>
+        <div class="subsection">
+          <h4>Create multicast VXLAN link</h4>
+          <pre>ip link add name ${interface name} type vxlan \ </pre>
+          <pre>   id &lt;0-16777215&gt; \ </pre>
+          <pre>   dev ${source interface} \ </pre>
+          <pre>   group ${multicast address} \ </pre>
+          <pre>   dstport ${VXLAN destination port} </pre>
+          <span>Example:</span>
+          <pre>ip link add name vxlan0 type vxlan \ </pre>
+          <pre>   id 42 dev eth0 group 239.0.0.1 dstport 4789 </pre>
+          <p>After that you need to bring the link up and either bridge it with
+             another interface or assign an address.</p>
+        </div>
+      </div>
+      <div class="section">
+        <h3>Route management</h3>
+        <hr />
+        <p>For IPv4 routes, you can use either a prefix length or a dotted decimal subnet mask.
+           That is, both 192.0.2.0/24 and 192.0.2.0/255.255.255.0 are equally acceptable.</p>
+        <p><strong>Note:</strong> as per the section below, if you set up a static route,
+           and it becomes unreachable because a link goes down, it will be removed and
+           <strong>will never get back on its own</strong>. You may not have noticed this behaviour
+           because in many cases additional software (e.g. NetworkManager or rp-pppoe)
+           takes care of restoring the routes when links go up and down.</p>
+        <p>If you are going to use your Linux machine as a router, consider installing
+           a routing protocol suite such as <a href="http://quagga.net">Quagga</a>
+           or <a href="http://bird.network.cz">BIRD</a>. They keep track of interface status
+           and restore routes when a link goes up after going down. Of course they also allow you
+           to use dynamic routing protocols such as OSPF and BGP.</p>
+        <div class="subsection">
+          <h4>Connected routes</h4>
+          <p>Some routes appear in the system without explicit configuration (against your will).</p>
+          <p>Once you assign an address to an interface, the system calculates its network address
+             and creates a route to it (this is why the subnet mask is required). These routes are
+             called connected routes.</p>
+          <p>For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network
+             will be created and the system will know that hosts from that network can be reached
+             directly.</p>
+          <p>When an interface goes down, connected routes associated with it are removed.
+             This is used for inaccessible gateway detection so routes through gateways that
+             went inaccessible are removed. Same mechanism prevents you from creating 
+             routes through inaccessible gateways.</p>
+        </div>
+        <div class="subsection">
+          <h4>View all routes</h4>
+          <pre>ip route</pre>
+          <pre>ip route show</pre>
+          <span>You can use -4 and -6 options to view only IPv4 or IPv6 routes. 
+                 If no options given, IPv4 routes are displayed. To view IPv6 routes, use:</span>
+          <pre>ip -6 route</pre>
+        </div>
+        <div class="subsection">
+          <h4>View routes to a network and all its subnets</h4>
+          <pre>ip route show to root ${address}/${mask}</pre>
+          <span>For example, if you use 192.168.0.0/24 subnet in your network
+                and it's broken into 192.168.0.0/25 and 192.168.0.128/25, you can see
+                all those routes with:</span>
+          <pre>ip route show to root 192.168.0.0/24</pre>
+          <span>Note: the word "to" in this and other show commands is optional.</span>
+        </div>
+        <div class="subsection">
+          <h4>View routes to a network and all supernets</h4>
+          <pre>ip route show to match ${address}/${mask}</pre>
+          <span>If you want to view routes to 192.168.0.0/24 and all larger subnets,
+                use:</span>
+          <pre>ip route show to match 192.168.0.0/24</pre>
+          <span>As routers prefer more specific routes to less specific,
+                this is often useful for debugging in situations when traffic to specific
+                subnet is sent the wrong way because a route to it is missing
+                but routes to larger subnets exist.</span>
+        </div>
+        <div class="subsection">
+          <h4>View routes to exact subnet</h4>
+          <pre>ip route show to exact ${address}/${mask}</pre>
+          <span>If you want to see the routes to 192.168.0.0/24, but not to,
+                say 192.168.0.0/25 and 192.168.0.0/16, you can use:</span>
+          <pre>ip route show to exact 192.168.0.0/24</pre>
+        </div>
+        <div class="subsection">
+          <h4>View only the route actually used by the kernel</h4>
+          <pre>ip route get ${address}/${mask}</pre>
+          <span>Example:</span>
+          <pre>ip route get 192.168.0.0/24</pre>
+          <span>Note that in complex routing scenarios like multipath routing,
+                the result may be "correct but not complete", as it always shows
+                one route that will be used first. In most situations it's not
+                a problem, but never forget to look at the corresponding "show" command
+                output too.</span>
+        </div>
+        <div class="subsection">
+          <h4>View route cache (pre 3.6 kernels only)</h4>
+          <pre>ip route show cached</pre>
+          <span>Until the version 3.6, Linux used
+                route caching. In older kernels, this command displays the contents
+                of the route cache. It can be used with modifiers
+                described above. In newer kernels it does nothing.</span>
+        </div>
+        <div class="subsection">
+          <h4>Add a route via gateway</h4>
+          <pre>ip route add ${address}/${mask} via ${next hop}</pre>
+          <span>Examples:</span>
+          <pre>ip route add 192.0.2.128/25 via 192.0.2.1</pre>
+          <pre>ip route add 2001:db8:1::/48 via 2001:db8:1::1</pre>
+        </div>
+        <div class="subsection">
+          <h4>Add a route via interface</h4>
+          <pre>ip route add ${address}/${mask} dev ${interface name}</pre>
+          <span>Example:</span>
+          <pre>ip route add 192.0.2.0/25 dev ppp0</pre>
+          <span>Interface routes are commonly used with point-to-point interfaces
+                like PPP tunnels where next hop address is not required.</span>
+        </div>
+        <div class="subsection">
+          <h4>Change or replace a route</h4>
+          <p>You may use "change" command to change parameters of existing routes.
+             "Replace" command can be used to add new route or modify existing one if
+             it doesn't exist. Examples:</p>
+          <pre>ip route change 192.168.2.0/24 via 10.0.0.1</pre>
+          <pre>ip route replace 192.0.2.1/27 dev tun0</pre> 
+        </div>
+        <div class="subsection">
+          <h4>Delete a route</h4>
+          <pre>ip route delete ${rest of the route statement}</pre>
+          <span>Examples:</span>
+          <pre>ip route delete 10.0.1.0/25 via 10.0.0.1</pre>
+          <pre>ip route delete default dev ppp0</pre>
+        </div>
+        <div class="subsection">
+          <h4>Default route</h4> <br/>
+          <span>There is a shortcut to add default route.</span>
+          <pre>ip route add default via ${address}/${mask}</pre>
+          <pre>ip route add default dev ${interface name}</pre>
+          <span>These are equivalent to:</span>
+          <pre>ip route add 0.0.0.0/0 via ${address}/${mask}</pre>
+          <pre>ip route add 0.0.0.0/0 dev ${interface name}</pre>
+          <span>With IPv6 routes it also works and is equivalent to ::/0</span>
+          <pre>ip -6 route add default via 2001:db8::1</pre>
+        </div>
+        <div class="subsection">
+          <h4>Blackhole routes</h4>
+          <pre>ip route add blackhole ${address}/${mask}</pre>
+          <span>Examples:</span>
+          <pre>ip route add blackhole 192.0.2.1/32</pre>
+          <p>Traffic to destinations that match a blackhole route is silently discarded.</p>
+          <p>Blackhole routes have dual purpose. First one is straightforward, to discard traffic
+             sent to unwanted destinations, e.g. known malicious hosts.</p>
+          <p>The second one is less obvious and uses the "longest match rule" as per RFC1812.
+             In some cases you may want the router to think it has a route to a larger subnet,
+             while you are not using it as a whole,
+             e.g. when advertising the whole subnet via dynamic routing protocols. Large subnets
+             are commonly broken into smaller parts, so if your subnet is 192.0.2.0/24, and you
+             have assigned 192.0.2.1/25 and 192.0.2.129/25 to your interfaces, your system creates connected
+             routes to the /25's, but not the whole /24, and routing daemons may not want to 
+             advertise /24 because you have no route to that exact subnet. The solution is to setup
+             a blackhole route to 192.0.2.0/24. Because routes to smaller subnets are preferred
+             over larger subnets, it will not affect actual routing, but will convince routing
+             daemons there's a route to the supernet.</p>
+        </div>
+        <div class="subsection">
+          <h4>Other special routes</h4>
+          <pre>ip route add unreachable ${address}/${mask}</pre>
+          <pre>ip route add prohibit ${address}/${mask}</pre>
+          <pre>ip route add throw ${address}/${mask}</pre>
+          <span>These routes make the system discard packets and reply with an ICMP error message to the sender.</span>
+          <dl>
+            <dt>unreachable</dt>
+            <dd>Sends ICMP "host unreachable".</dd>
+            <dt>prohibit</dt>
+            <dd>Sends ICMP "administratively prohibited".</dd>
+            <dt>throw</dt>
+            <dd>Sends "net unreachable".</dd>
+          </dl>
+          <p>Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g. DDoS)
+             because they generate a reply packet for every discarded packet and thus create even greater traffic flow.
+             They can be good for implementing internal access policies, but consider firewall for this purpose first.</p>
+          <p>"Throw" routes may be used for implementing policy-based routing, in non-default tables they
+             stop current table lookup, but don't send ICMP error messages.</p>
+        </div>
+        <div class="subsection">
+          <h4>Routes with different metric</h4>
+          <pre>ip route add ${address}/${mask} via ${gateway} metric ${number}</pre>
+          <span>Examples:</span>
+          <pre>ip route add 192.168.2.0/24 via 10.0.1.1 metric 5</pre>
+          <pre>ip route add 192.168.2.0 dev ppp0 metric 10</pre>
+          <p>If there are several routes to the same network with different metric value,
+                the one with <strong>the lowest</strong> metric will be preferred.</p>
+          <p>Important part of this concept is that when an interface goes down, routes
+                that would be rendered useless by this event disappear from the routing table (see the <a href="#Connected routes">Connected Routes</a> section), and
+                the system will fall back to higher metric routes.</p>
+          <p>This feature is commonly used to implement backup connections to important destinations.</p>
+        </div>
+        <div class="subsection">
+          <h4>Multipath routing</h4>
+          <pre>ip route add ${addresss}/${mask} nexthop via ${gateway 1} weight ${number} nexthop via ${gateway 2} weight ${number}</pre>
+          <p>Multipath routes make the system balance packets across several links according to the weight (higher weight is preferred, so
+             gateway/interface with weight of 2 will get roughly two times more traffic than another one with weight of 1). You can have as many gateways
+             as you want and mix gateway and interface routes, like:</p>
+          <pre>ip route add default nexthop via 192.168.1.1 weight 1 nexthop dev ppp0 weight 10</pre>
+          <p> <strong>Warning:</strong> the downside of this type of balancing is that packets are not guaranteed to be sent back
+             through the same link they came in. This is called "asymmetric routing". For routers that simply forward packets and don't
+             do any local traffic processing such as NAT, this is usually normal, and in some cases even unavoidable.</p>
+          <p>If your system does anything but forwarding packets between interfaces, this may cause problems with incoming connections
+             and some measures should be taken to prevent it.</p>
+        </div>
+      </div>
+      <div class="section">
         <h3>Policy-based routing</h3>
         <hr />
         <p>Policy-based routing (PBR) in Linux is designed the following way:
@@ -1236,20 +1274,6 @@ $ ip -6 rule show
         </div>
       </div>
       <div class="section">
-        <h3>netconf (sysctl configuration viewing)</h3>
-        <hr />
-        <div class="subsection">
-          <h4>View sysctl configuration for all interfaces</h4>
-          <pre>ip netconf show</pre>
-        </div>
-        <div class="subsection">
-          <h4>View sysctl configuration for specific interface</h4>
-          <pre>ip netconf show dev ${interface}</pre>
-          <span>Examples:</span>
-          <pre>ip netconf show dev eth0</pre>
-        </div>
-      </div>
-      <div class="section">
         <h3>Network namespace management</h3>
         <hr />
         <p>Network namespaces are isolated network stack instances within a single machine. They can be used
@@ -1338,45 +1362,6 @@ $ ip -6 rule show
         </div>
       </div>
       <div class="section">
-        <h3>VXLAN management</h3>
-        <hr />
-        <p>VXLAN is a layer 2 tunneling protocol that is commonly used in conjunction with
-           virtualization systems such as KVM to connect virtual machines running on different
-           hypervisor nodes to each other and to outside world.</p>
-        <p>Unlike GRE or L2TPv3 that are point to point, VXLAN replicates some properties of
-           multiple access switched networks by using IP multicast. Also it supports virtual network
-           separation by transmitting a network identifier along with the frame.</p>
-        <p>The downside is that you will need to use a multicast routing protocol, typically PIM-SM,
-           to get it to work over routed networks.</p>
-        <p>The underlying encapsulation protocol for VXLAN is UDP.</p>
-        <div class="subsection">
-          <h4>Create unicast VXLAN link</h4>
-          <pre>ip link add name ${interface name} type vxlan \ </pre>
-          <pre>   id &lt;0-16777215&gt; \ </pre>
-          <pre>   dev ${source interface}\ </pre>
-          <pre>   remote ${remote endpoint address} \ </pre>
-          <pre>   local ${local endpoint address} \ </pre>
-          <pre>   dstport ${VXLAN destination port} </pre>
-          <span>Example:</span>
-          <pre>ip link add name vxlan0 type vxlan \ </pre>
-          <pre>   id 42 dev eth0 remote 203.0.113.6 local 192.0.2.1 dstport 4789 </pre>
-          <p><strong>Note:</strong> id options means VXLAN Network Identifier (VNI).</p>
-        </div>
-        <div class="subsection">
-          <h4>Create multicast VXLAN link</h4>
-          <pre>ip link add name ${interface name} type vxlan \ </pre>
-          <pre>   id &lt;0-16777215&gt; \ </pre>
-          <pre>   dev ${source interface} \ </pre>
-          <pre>   group ${multicast address} \ </pre>
-          <pre>   dstport ${VXLAN destination port} </pre>
-          <span>Example:</span>
-          <pre>ip link add name vxlan0 type vxlan \ </pre>
-          <pre>   id 42 dev eth0 group 239.0.0.1 dstport 4789 </pre>
-          <p>After that you need to bring the link up and either bridge it with
-             another interface or assign an address.</p>
-        </div>
-      </div>
-      <div class="section">
         <h3>Multicast management</h3>
         <hr />
         <p>Multicast is mostly handled by applications and routing daemons, so there is not much
@@ -1453,6 +1438,20 @@ $ ip -6 rule show
           <p>rtmon syntax is similar to that of "ip monitor", except event type is limited to
              link, address, route, and all; and address family is specified in "-family" option.</p>
           <pre>rtmon [-family &lt;inet|inet6&gt;] [&lt;route|link|address|all&gt;] file ${log file path}</pre>
+        </div>
+      </div>
+      <div class="section">
+        <h3>netconf (sysctl configuration viewing)</h3>
+        <hr />
+        <div class="subsection">
+          <h4>View sysctl configuration for all interfaces</h4>
+          <pre>ip netconf show</pre>
+        </div>
+        <div class="subsection">
+          <h4>View sysctl configuration for specific interface</h4>
+          <pre>ip netconf show dev ${interface}</pre>
+          <span>Examples:</span>
+          <pre>ip netconf show dev eth0</pre>
         </div>
       </div>
       <div class="contributors">
