@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <title>Task-centered iproute2 user guide</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1"/>
     <style type="text/css">
 	body {font: 13px/1 Helvetica,Arial,sans-serif; color: #444; }
 	h1, h2, h3, h4, h5 { margin: 1em 0 1em; padding: 0;}
@@ -420,7 +420,7 @@
              in example above, this is also used to increase performance of
              gigabit ethernet links that support so called "jumbo frames"
              (frames up to 9000 bytes large). If all your equipment
-             supports gigabit ethernet, you may want to do something like
+             supports gigabit ethernet, you may want to do something like:</p>
           <pre>ip link set dev eth0 mtu 9000</pre>
           <p>Note that you may need to configure it on your L2 switches too,
              some of them have it disabled by default.</p>
@@ -670,8 +670,7 @@
 	     This can be bypassed, thus disabling the traffic control engine
 	     for this tun/tap device.
 	  </p>
-	  </p>
-	  <pre>ip tuntap add dev ${interface name} mode ${mode} one_queue</pre>
+	  	  <pre>ip tuntap add dev ${interface name} mode ${mode} one_queue</pre>
           <span>Example:</span>
           <pre>ip tuntap add dev tun1 mode tun one_queue</pre>
         </div>
@@ -1451,7 +1450,7 @@ $ ip -6 rule show
             <dt>mroute</dt>
             <dd>Multicast routing changes.</dd>
             <dt>neigh</dt>
-            <dd>Changes in neighbor (ARP and NDP) tables.<dd>
+            <dd>Changes in neighbor (ARP and NDP) tables.</dd>
           </dl>
           <p>When there are distinct IPv4 and IPv6 subsystems, the usual "-4" and "-6" options
              allow you to display events only for specified protocol. As in:</p>
