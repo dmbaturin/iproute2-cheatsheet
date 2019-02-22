@@ -212,6 +212,32 @@
         <p>Metasyntactic variables are written in shell-style syntax, ${something}. Optional command parts are in
            square brackets.</p>
 
+        <h3>Scripting considerations</h3>
+        <p>A common complaint is that removal of ifconfig forces people to rewrite scripts. The advantage
+           is that scripts rewritten to use iproute2 can be much simpler due to better support for machine-readable output.</p>
+        <p>iproute2 provides options that make parsing its output particularly easy.</p>
+        <dl>
+          <dt> <kbd>-o</kbd> (<kbd>--oneline</kbd>) </dt>
+          <dd>Replaces every line break with a back slash. Supported since the earliest versions.</dd>
+          <dt> <kbd>-br</kbd> (<kbd>--brief</kbd>) </dt>
+          <dd>Produces a terse, machine-oriented output. Perfect for dissecting with awk/cut. Supported since at least 4.11.</dd>
+          <dt> <kbd>-j</kbd> (<kbd>--json</kbd>) </dt>
+          <dd>Produces JSON output, perfect for non-shell scripts. Supports <kbd>--pretty</kbd> and <kbd>--brief</kbd> options to change formatting or level of detail.
+              Supported since at least 4.13.</kbd>
+        </dl>
+        <p>Here is a comparison of outputs, with <kbd>--json --pretty</kbd> and <kbd>--json</kbd> omitted to save space:</p>
+        <pre>
+$ ip --oneline address show lo
+1: lo    inet 127.0.0.1/8 scope host lo\       valid_lft forever preferred_lft forever
+1: lo    inet6 ::1/128 scope host \       valid_lft forever preferred_lft forever
+
+$ ip --brief address show lo
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+
+$ ip --json --brief address show lo
+[{"ifname":"lo","operstate":"UNKNOWN","addr_info":[{"local":"127.0.0.1","prefixlen":8},{"local":"::1","prefixlen":128}]},{},{}]
+        </pre>
+
         <h3>Table of contents</h3>
 
         <form>
