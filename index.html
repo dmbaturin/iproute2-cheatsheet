@@ -183,19 +183,35 @@
   <body onload="gen_toc()">
     <div class="wrapper">
       <div class="preface">
-        <h3>Overview</h3>
-        <p>iproute2 is the Linux networking toolkit that replaced net-tools (ifconfig, route, arp etc.)</p>
-        <p>Old style network utilities like ifconfig and route are still there just for backwards compatibility
-           and do not provide access to new features like policy-based routing or network namespaces.</p>
-        <p>Note that iproute2 has been a <strong>standard Linux tool</strong> since the early 2000's. It's included in
-           every distro by default, or at least available from the repos (OpenWRT is one of the cases).</p>
+        <h1>Task-centered iproute2 user guide</h1>
+        <h3>Overivew of iproute2</h3>
+        <p>iproute2 is the Linux networking toolkit that replaced net-tools (ifconfig, vconfig, route, arp etc.).
+           The <kbd>ip</kbd> command comes from the iproute2 package, as well as <kbd>tc</kbd> and a few others.</p>
+        <p>Old style network utilities like <kbd>ifconfig</kbd> and <kbd>route</kbd> are still there just for backwards compatibility
+           and do not provide access to new features like policy-based routing or network namespaces.
+           Recent versions of many GNU/Linux distributions no longer install them by default in all installation
+           flavours.</p>
+        <p>Note that iproute2 is not new, it has been a <strong>standard Linux tool</strong> since the early 2000's. It's been included in
+           every distro by default, or at least available from the repos for a very long time.</p>
+        <p>It's a tool that needs learning, but it gives you more control over the Linux networking features and
+           troubleshooting options than the old tools ever could.</p>
         <p>iproute2 was originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger.</p>
-        <p>This document aims to provide comprehensive but easy to use documentation for the ip command
-           included in iproute2 package. There are more, such as ss (netstat replacement, fairly straightforward),
-           tc (QoS management), but documenting them in this style, especially tc, would be a separate big project.</p>
+
+        <h3>About this document</h3>
+        <p>Historically, documentation has been a weak side of iproute2. The official man pages list
+           available options but don't give almost any usage examples. This need therefore has been addressed
+           by community-provided documentation.</p>
+        <p>This document aims to provide comprehensive but easy to use guide to the <kbd>ip</kbd> command
+           that controls almost all network subsystems of the Linux kernel. There are more, such as <kbd>ss</kbd> (netstat replacement, fairly straightforward),
+           <kbd>tc</kbd> (QoS management), but documenting them in this style, especially <kbd>tc</kbd>, would be a separate big project.</p>
         <p>Instead of listing commands and describing what they do, it uses a task-centered approach and gives commands
            for tasks that network administrators need to do. It was once called a &ldquo;cheatsheet&rdquo;
-           for this reason, but has long outgrown the size and scope of a cheat sheet for the most common tasks.</p>
+           for this reason, but has long outgrown the size and scope of a cheat sheet.</p>
+
+        <h3>About this document</h3>
+        <p>This documented is maintained by <a href="https://baturin.org">Daniil Baturin</a> and is distributed
+           under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA 4.0</a>, which is a strong copyleft,
+           free culture license.</p>
         <p>Contributions are always welcome, you can find the &ldquo;source code&rdquo; at
            <a href="https://github.com/dmbaturin/iproute2-cheatsheet">github.com/dmbaturin/iproute2-cheatsheet</a>.</p>
         <pre>git clone https://github.com/dmbaturin/iproute2-cheatsheet.git</pre>
@@ -235,7 +251,7 @@ $ ip --brief address show lo
 lo               UNKNOWN        127.0.0.1/8 ::1/128 
 
 $ ip --json --brief address show lo
-[{"ifname":"lo","operstate":"UNKNOWN","addr_info":[{"local":"127.0.0.1","prefixlen":8},{"local":"::1","prefixlen":128}]},{},{}]
+[{"ifname": "lo", "operstate": "UNKNOWN", "addr_info": [{"local": "127.0.0.1", "prefixlen": 8},{"local": "::1", "prefixlen": 128}]}, {}, {}]
         </pre>
 
         <h3>Table of contents</h3>
@@ -1553,7 +1569,7 @@ $ ip -6 rule show
                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
 	</a><br />
         <br />
-        <span>Last modified: 2017 Nov 23.</span>
+        <span>Last modified: 2019 Feb 22.</span>
       </div>
     </div>
   </body>
