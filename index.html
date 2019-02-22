@@ -1378,7 +1378,7 @@ $ ip -6 rule show
           <pre>ip netns exec foo ip address add 10.1.1.1/24 dev veth2</pre>
           <span>Add an address to veth1, which stays in the default namespace:</span>
           <pre>ip address add 10.1.1.2/24 dev veth1</pre>
-          <p>Now you can ping 10.1.1.1 which if in foo namespace, and setup routes to
+          <p>Now you can ping 10.1.1.1 which is in foo namespace, and setup routes to
              subnets configured in other interfaces of that namespace.</p>
           <p>If you want switching instead of routing, you can bridge those veth
              interfaces with other interfaces in corresponding namespaces. Same technique
