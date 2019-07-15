@@ -36,6 +36,17 @@ The page is bundled with all the JS and CSS it needs, so it's easy to mirror.
 If you decide to mirror it, please make sure to update it automatically from git to avoid
 creating outdated copies.
 
+# Repository structure
+
+This page is preprocessed with [soupault](https://baturin.org/projects/soupault)
+website generator to create a static ToC with section links that doesn't
+rely on JS.
+
+The page wrapping is in `templates/main.html` and the content is in `site/index.html`.
+For ease of mirroring, a preprocessed copy is kept in `build/index.html`.
+
+If you want to setup a self-updating mirror, fetch the `build/index.html` page.
+
 # Contributing
 
 Patches are always welcome. If you want to fix a typo, improve grammar or wording,

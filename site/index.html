@@ -1,186 +1,3 @@
-﻿<!DOCTYPE html>
-<html>
-  <head>
-    <title>Task-centered iproute2 user guide</title>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1"/>
-    <style type="text/css">
-	body {font: 13px/1 Helvetica,Arial,sans-serif; color: #444; }
-	h1, h2, h3, h4, h5 { margin: 1em 0 1em; padding: 0;}
-	p { font-size: 14px; line-height: 20px; margin: 1em 0 ; }
-	a { color: #09F; margin: 0px; padding: 0px; vertical-align: baseline;}
-	li { line-height: 24px; margin-left: 44px;}
-	ul, ol { font-size: 14px; line-height: 20px;}
-
-	h3 { font-size: 21px;}
-	
-      .wrapper { width: 800px; margin: 20px auto; }
-
-      .contributors , .section { border: #dadada solid 1px; padding: 20px 14px ; margin: 20px 0 }
-      
-      .subsection { padding: 20px 14px ; margin: 0 -14px }
-      .subsection:nth-child(odd) { background-color: #ededed }
-
-      .code { font-family: monospace; }
-      pre { margin-left: 40px; white-space: pre-wrap }
-
-      .copyright { text-align: center; }
-
-
-       hr { height: 1px; background-color: #aaaaaa; border: 0 none; margin: 0; }
-       
-    .subsection h3, .subsection h4, .subsection h5 {
-        margin: 0 0 2em;
-    }
-    
-    .subsection :last-child, .section :last-child { margin-bottom:0 }
-    .subsection :first-child, .section :first-child { margin-top:0 }
-    
-    
-    p, span {text-align:justify;}
-    
-    @media print {
-        
-        body {color: black}
-        a { color: #222;  text-decoration: none;}
-        
-        a:after{content:" " attr(href) " ";font-weight:normal; text-decoration: underline; }
-        
-        
-        #toc a { text-decoration: none; color:black }
-        #toc a:after {content:""}
-        
-        .wrapper { width: auto; margin: 0; }
-        .contributors, .section {
-            border: 0;
-            page-break-before: always;
-            width: auto;
-            margin: 0;
-            padding: 0;
-            }
-        .subsection {
-            page-break-inside: avoid;
-            border-top: gray solid 1px;
-            margin: 0;
-            padding: 1em 0 1em
-            }
-
-        .subsection:nth-child(odd) { background-color: transparent }
-
-    	li {page-break-inside: avoid;}
-    	
-    	
-        .copyright {
-            text-align: left; /* dont know how to pull it down, lets look like contributors */
-        }
-        
-        #toc { page-break-before: always; }
-        
-        #toc:before { content:"Table of Contents:"; font-size: 120%; }
-
-      
-      }
-    	
-        
-    @media only screen and (max-device-width: 800px) {
-         .wrapper { width: auto; margin: auto; }
-        li {    margin-left:0;}
-        .contributors, .section {
-        border: 0;
-        padding-left:0;
-        padding-right:0;
-        }
-        
-    }
-   
-       
-    </style>
-    <script type="text/javascript">
-    //<![CDATA[
-
-      function expand_toc()
-      {
-          var subsections = document.getElementsByClassName('subsection-toc');
-          for(var i=0;i<subsections.length; i+=1)
-          {
-              subsections[i].style.display = "";
-          }
-      }
-
-      function collapse_toc()
-      {
-          var subsections = document.getElementsByClassName('subsection-toc');
-          for(var i=0;i<subsections.length; i+=1)
-          {
-              subsections[i].style.display = "none";
-          }
-      }
-
-      // Generate table of contents
-      // Only two levels
-      // I could make it recursive, but we don't want infinite
-      // nesting in this document, right?
-      function gen_toc()
-      {
-           var toc_ol = document.getElementById('toc');
-
-           var sections = document.getElementsByClassName('section');
-           for(i=0; i<sections.length; i+=1)
-           {
-              var section_toc = document.createElement("li");
-
-              // Generate section link
-              // Name is taken from the first h3 occurence, if there's more
-              // than one h3, it's a mistake
-              var section_header = sections[i].getElementsByTagName('h3');
-              var section_name = section_header[0].innerHTML;
-              var section_link = document.createElement('a');
-              section_link.innerHTML = section_name;
-              section_link.href = "#" + section_name;
-              section_toc.appendChild(section_link);
-
-              // Create corresponding anchor and insert before the header
-              var section_anchor = document.createElement('a');
-              section_anchor.name = section_name;
-              sections[i].insertBefore(section_anchor, section_header[0]);
-
-              var subsections = sections[i].getElementsByClassName('subsection');
-              var subsection_toc = document.createElement('ol');
-
-              // Make subsection ToC'es hidden by default
-              subsection_toc.className = "subsection-toc";
-              subsection_toc.style.display = "none";
-
-              for(j=0;j<subsections.length;j+=1)
-              {
-
-                  // Generate subsection link
-                  // Name is taken from first h4 occurence
-                  var subsection_item = document.createElement('li');
-                  var subsection_link = document.createElement('a');
-                  var subsection_header = subsections[j].getElementsByTagName('h4');
-                  var subsection_name = subsection_header[0].innerHTML;
-                  subsection_link.innerHTML = subsection_name;
-                  subsection_link.href = "#" + subsection_name;
-                  subsection_item.appendChild(subsection_link);
-
-                  // Generate and insert subsection link
-                  var subsection_anchor = document.createElement('a');
-                  subsection_anchor.name= subsection_name;
-                  subsections[j].insertBefore(subsection_anchor, subsection_header[0]);
-                  
-                  subsection_toc.appendChild(subsection_item);
-                  section_toc.appendChild(subsection_toc);
-              }
-
-              toc_ol.appendChild(section_toc);
-           }
-
-      }
-    //]]>
-    </script>
-  </head>
-  <body onload="gen_toc()">
     <div class="wrapper">
       <div class="preface">
         <h1>Task-centered iproute2 user guide</h1>
@@ -273,9 +90,8 @@ $ ip --json --brief address show lo
           <input type="button" onclick="collapse_toc()" value="Collapse table of contents"/>
         </form>
 
-        <ol id="toc">
-
-        </ol>
+        <div id="toc">
+        </div>
       </div>
       <div class="section">
         <h3>Address management</h3>
@@ -1575,14 +1391,12 @@ $ ip -6 rule show
       </div>
       <div class="copyright">
         <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt;
-                2013, 2015, 2017.</span> <br /><br />
+                2013-2019.</span> <br /><br />
         <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
            <img alt="Creative Commons License" style="border-width:0"
                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
 	</a><br />
         <br />
-        <span>Last modified: 2019 Feb 22.</span>
+        <span>Last modified: 2019-07-16.</span>
       </div>
     </div>
-  </body>
-</html>
