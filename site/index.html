@@ -1108,7 +1108,14 @@ tunnel_id ${tunnel identifier}
           <pre>ip rule add fwmark ${mark} ${action}</pre>
           <span>Examples:</span>
           <pre>ip rule add fwmark 0x11 lookup 100</pre>
-          <p><strong>Note:</strong> See iptables documentation to find out how to set the mark.</p>
+          <p>
+            You should be careful to insert the marking rule into a chain that is processed
+            <em>before</em> the routing decision, else it will have no effect.
+            An excellent <a href="https://stuffphilwrites.com/2014/09/iptables-processing-flowchart/">netfilter flowchart</a>
+            can be found in Phil Hagen's blog.
+            For forwarded traffic, <code>mangle FORWARD</code> should be a good place,
+            e.g. <code>iptables -t mangle -I FORWARD -s 192.0.2.1 -j MARK --set-mark 0x11</code>.
+          </p>
         </div>
         <div class="subsection">
           <h4>Create a rule to match inbound interface</h4>
@@ -1124,6 +1131,16 @@ tunnel_id ${tunnel identifier}
           <span>Examples:</span>
           <pre>ip rule add oif eth0 lookup 10</pre>
           <p><strong>Note:</strong> this works only for locally generated traffic.</p>
+        </div>
+        <div class="subsection">
+          <h4>Create a rule to match a user id range</h4>
+          <pre>ip rule add uidrange ${start}-${end}</pre>
+          <span>Examples:</span>
+          <code>ip rule add uidrange 1000-1100 lookup 10</code>
+          <code>ip rule add uidrange 3000-3000 lookup 20</code>
+          <p>
+            To apply a rule to a single user, use the same UID for both start and end of the range.
+          </p>
         </div>
         <div class="subsection">
           <h4>Set rule priority</h4>
@@ -1390,13 +1407,13 @@ $ ip -6 rule show
 	</p>
       </div>
       <div class="copyright">
-        <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt;
+        <span>Copyright &copy; Daniil Baturin &lt;daniil at baturin dot org&gt; et al.
                 2013-2019.</span> <br /><br />
         <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
            <img alt="Creative Commons License" style="border-width:0"
                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
 	</a><br />
         <br />
-        <span>Last modified: 2019-07-16.</span>
+        <span>Last modified: 2019-09-05.</span>
       </div>
     </div>
