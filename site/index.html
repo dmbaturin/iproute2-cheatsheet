@@ -1190,6 +1190,56 @@ $ ip -6 rule show
         </div>
       </div>
       <div class="section">
+        <h3>VRF management</h3>
+        <hr />
+        <p>VRF (Virtual Routing and Forwarding) is a mechanism for isolating routes of a network in a separate
+           routing table. It allows multiple networks with conflicting address ranges to co-exist in the same router.
+           The most common use case for it is multi-tenant setups and provider-supported VPNs where customers can use
+           their own network addresses.</p>
+        <p>The main difference from policy-based routing is that "normal" non-default tables used in PBR
+           only separate static routes, but not connected routes, so they cannot resolve address conflicts.
+           When a network interface is bound to a VRF, all connected routes from it will be moved to a separate routing
+           table.</p>
+        <p>Unlike <a href="#Network namespace management">network namespaces</a>, VRFs work exclusively on the network layer.
+           They do not create a separate copy of the network stack, do not interfere with L2 protocols such as LLDP,
+           and one process can bind sockets to multiple VRFs (useful for dynamic routing protocol or IPsec daemons).</p>
+        <div class="subsection">
+          <h4>Create a VRF</h4>
+          <pre>ip link add ${name} type vrf table ${table}</pre>
+          <span>Example:</span>
+          <pre>sudo ip link add foo type vrf table 100</pre>
+          <p>If routing table does not exist, it will be automatically created.</p>
+        </div>
+        <div class="subsection">
+          <h4>View configured VRFs</h4>
+          <pre>ip vrf show</pre>
+          <pre>ip link show vrf ${vrf}</pre>
+          <p>The output of <code>ip vrf show</code> only shows association between VRFs and routing tables, but not between VRFs and network interfaces.
+             To view all interfaces of a VRF, use <code>ip link show vrf ${vrf}</code>.</p>
+        </div>
+        <div class="subsection">
+          <h4>Bind an interface to a VRF</h4>
+          <pre>ip link set ${interface} master ${vrf}</pre>
+          <span>Example:</span>
+          <pre>ip link set eth0 master foo</pre>
+          <p>All connected routes associated with the interface will be moved to the VRF table.
+             For example, if <code>eth0</code> has address 192.0.2.1/24, and VRF instance <code>foo</code> uses table 100, then the route to 192.0.2.0/24 will disappear
+             from the main table and re-appear in the table 100.</p>
+        </div>
+        <div class="subsection">
+          <h4>Remove an interface from a VRF</h4>
+          <pre>ip link set ${interface} nomaster</pre>
+          <p>Connected routes associated with that interface will be moved back to the main table.</p>
+        </div>
+        <div class="subsection">
+          <h4>Run a command inside a VRF</h4>
+          <pre>ip vrf exec ${vrf} ${command}</pre>
+          <span>Examples:</span>
+          <pre>ip vrf exec ping 192.0.2.100</pre>
+          <p>The traffic of the process will be routed according to the VRF table routes, so it's useful for troubleshooting.</p>
+        </div>
+      </div>
+      <div class="section">
         <h3>Network namespace management</h3>
         <hr />
         <p>Network namespaces are isolated network stack instances within a single machine. They can be used
@@ -1414,6 +1464,6 @@ $ ip -6 rule show
                  src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
 	</a><br />
         <br />
-        <span>Last modified: 2019-09-05.</span>
+        <span>Last modified: 2019-09-17.</span>
       </div>
     </div>
