@@ -25,13 +25,14 @@
            for tasks that network administrators need to do. It was once called a &ldquo;cheatsheet&rdquo;
            for this reason, but has long outgrown the size and scope of a cheat sheet.</p>
 
-        <h3>About this document</h3>
-        <p>This documented is maintained by <a href="https://baturin.org">Daniil Baturin</a> and is distributed
-           under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA 4.0</a>, which is a strong copyleft,
+        <h3>Contributing</h3>
+        <p>This documented is maintained by <a href="https://baturin.org">Daniil Baturin</a> and distributed
+           under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA 4.0</a>, a strong copyleft,
            free culture license.</p>
         <p>Contributions are always welcome, you can find the &ldquo;source code&rdquo; at
            <a href="https://github.com/dmbaturin/iproute2-cheatsheet">github.com/dmbaturin/iproute2-cheatsheet</a>.</p>
         <pre>git clone https://github.com/dmbaturin/iproute2-cheatsheet.git</pre>
+        <p>You can also show your support by buying the maintainer a <a href="https://www.buymeacoffee.com/dmbaturin">metaphorical coffee</a>.</p>
         <p>This document is provided &ldquo;as is&rdquo;, without any warranty. The authors are not liable for any
            damage related to using it.</p>
 
@@ -216,7 +217,7 @@ $ ip --json --brief address show lo
       <div class="section">
         <h3>Link management</h3>
         <hr />
-        <p>Link is another term for a for network interface. Commands from the "ip link" family perform operations
+        <p>Link is another term for a network interface. Commands from the "ip link" family perform operations
            that are common for all interface types, like viewing link information or changing the MTU.</p>
         <p>Historically "ip link" commands could create all types of interfaces, except for tunnels (IPIP, GRE etc.), L2TPv3, and VXLAN
             interfaces that have their own commands. In newer iproute2 versions (since at least 3.16) they can create interfaces of all
@@ -1190,6 +1191,56 @@ $ ip -6 rule show
         </div>
       </div>
       <div class="section">
+        <h3>VRF management</h3>
+        <hr />
+        <p>VRF (Virtual Routing and Forwarding) is a mechanism for isolating routes of a network in a separate
+           routing table. It allows multiple networks with conflicting address ranges to co-exist in the same router.
+           The most common use case for it is multi-tenant setups and provider-supported VPNs where customers can use
+           their own network addresses.</p>
+        <p>The main difference from policy-based routing is that "normal" non-default tables used in PBR
+           only separate static routes, but not connected routes, so they cannot resolve address conflicts.
+           When a network interface is bound to a VRF, all connected routes from it will be moved to a separate routing
+           table.</p>
+        <p>Unlike <a href="#Network namespace management">network namespaces</a>, VRFs work exclusively on the network layer.
+           They do not create a separate copy of the network stack, do not interfere with L2 protocols such as LLDP,
+           and one process can bind sockets to multiple VRFs (useful for dynamic routing protocol or IPsec daemons).</p>
+        <div class="subsection">
+          <h4>Create a VRF</h4>
+          <pre>ip link add ${name} type vrf table ${table}</pre>
+          <span>Example:</span>
+          <pre>sudo ip link add foo type vrf table 100</pre>
+          <p>If routing table does not exist, it will be automatically created.</p>
+        </div>
+        <div class="subsection">
+          <h4>View configured VRFs</h4>
+          <pre>ip vrf show</pre>
+          <pre>ip link show vrf ${vrf}</pre>
+          <p>The output of <code>ip vrf show</code> only shows association between VRFs and routing tables, but not between VRFs and network interfaces.
+             To view all interfaces of a VRF, use <code>ip link show vrf ${vrf}</code>.</p>
+        </div>
+        <div class="subsection">
+          <h4>Bind an interface to a VRF</h4>
+          <pre>ip link set ${interface} master ${vrf}</pre>
+          <span>Example:</span>
+          <pre>ip link set eth0 master foo</pre>
+          <p>All connected routes associated with the interface will be moved to the VRF table.
+             For example, if <code>eth0</code> has address 192.0.2.1/24, and VRF instance <code>foo</code> uses table 100, then the route to 192.0.2.0/24 will disappear
+             from the main table and re-appear in the table 100.</p>
+        </div>
+        <div class="subsection">
+          <h4>Remove an interface from a VRF</h4>
+          <pre>ip link set ${interface} nomaster</pre>
+          <p>Connected routes associated with that interface will be moved back to the main table.</p>
+        </div>
+        <div class="subsection">
+          <h4>Run a command inside a VRF</h4>
+          <pre>ip vrf exec ${vrf} ${command}</pre>
+          <span>Examples:</span>
+          <pre>ip vrf exec ping 192.0.2.100</pre>
+          <p>The traffic of the process will be routed according to the VRF table routes, so it's useful for troubleshooting.</p>
+        </div>
+      </div>
+      <div class="section">
         <h3>Network namespace management</h3>
         <hr />
         <p>Network namespaces are isolated network stack instances within a single machine. They can be used
@@ -1412,9 +1463,10 @@ $ ip -6 rule show
         <div>
           <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
              <img alt="Creative Commons License" style="border-width:0"
-                   src="https://baturin.org/docs/iproute2/cc-by-sa.png" />
+                   src="cc-by-sa.png" />
           </a>
-          <a href="https://soupault.neocities.org"> <img src="https://baturin.org/docs/iproute2/powered_by_soupault_88x31.png" alt="powered by soupault"> </a>
+          <a href="https://soupault.neocities.org"> <img src="powered_by_soupault_88x31.png" alt="powered by soupault"> </a>
+          <a href="https://www.buymeacoffee.com/dmbaturin" target="_blank"><img src="buymeacoffee.png" alt="Buy Me A Coffee" style="height: 31px !important;" ></a>
           <br />
           <br />
           <span>Last modified: 2019-09-05.</span>
