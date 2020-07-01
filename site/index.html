@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
   <head>
     <title>Task-centered iproute2 user guide</title>
     <meta charset="utf-8" />
@@ -10,6 +10,14 @@
       a { color: #09F; margin: 0px; padding: 0px; vertical-align: baseline;}
       li { line-height: 24px; margin-left: 44px;}
       ul, ol { font-size: 14px; line-height: 20px;}
+
+      /* Display the expand/collapse triangle button at the same level
+         as list bullets */
+      ul.toc { list-style-position: inside; }
+      li.collapsible { list-style: none; }
+
+      /* Make it clear that the expand/collapse triangle symbol is clickable */
+      summary { cursor: pointer; }
 
       h3 { font-size: 21px;}
 	
@@ -91,31 +99,6 @@
         }
       }
     </style>
-    <script type="text/javascript">
-    //<![CDATA[
-
-      function expand_toc()
-      {
-          var subsections = document.getElementsByClassName('toc-4');
-          for(var i=0;i<subsections.length; i+=1)
-          {
-              subsections[i].style.display = "";
-          }
-      }
-
-      function collapse_toc()
-      {
-          var subsections = document.getElementsByClassName('toc-4');
-          for(var i=0;i<subsections.length; i+=1)
-          {
-              subsections[i].style.display = "none";
-          }
-      }
-
-      window.addEventListener('DOMContentLoaded', (event) => { collapse_toc(); });
-
-    //]]>
-    </script>
   </head>
   <body>
     <div class="wrapper">
@@ -205,11 +188,6 @@ $ ip --json --brief address show lo
         </pre>
 
         <h3>Table of contents</h3>
-
-        <form>
-          <input type="button" onclick="expand_toc()" value="Expand table of contents"/>
-          <input type="button" onclick="collapse_toc()" value="Collapse table of contents"/>
-        </form>
 
         <div id="toc">
         </div>
@@ -1542,7 +1520,7 @@ $ ip -6 rule show
         </div>
       </div>
       <div class="contributors">
-        <h3>Contributors:</h3>
+        <h3>Contributors</h3>
         <h4>Content</h4>
         <dl>
           <dt>Nicolas Dichtel</dt>
