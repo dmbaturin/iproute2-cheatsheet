@@ -1,31 +1,33 @@
 Task-centered iproute2 manual
 =============================
 
-The `ip` command from the iproute2 package is now **the** Linux network management tool.
-Not only it combines the functionality of the old `ifconfig`, `vconfig` etc. commands,
-it also supports networking features that old commands never supported and still
-don't support, such as multiple addresses on the same interface, network namespaces,
-policy-based routing and so on.
+The `ip` command from the iproute2 package is now **the** Linux network management tool. 
+Not only does it combine the functionality of the old `ifconfig`, `vconfig`, `route`, 
+and other commands, it also supports networking features that the old tools still 
+do not support. Some examples of missing functionality are multiple addresses on the 
+same interface, policy-based routing, VRFs, and more.
 
-One problem with the iproute2 package though is that its man pages offer only very brief
-descriptions of its options and don't provide any examples, so they are only good as reminders
-for experienced users. Many people keep using `ifconfig` not just out of habit, but also because
-they may not even know what they are missing out.
+A major issue with the iproute2 package is its documentation.  The man pages are extremely sparse, 
+only containing basic descriptions of the options and functionality, and no meaningful examples.
+While for an experienced user, this level of documentation is enough, for most novice users, it is not.
+Many users continue using the `ifconfig` suite of tools out of habit and familiarity, 
+and ultimately miss out on the powerful advantages of the `ip` tool. 
 
-The problem was historically solved by community-maintained documentation such as
-http://policyrouting.org/iproute2-toc.html and https://www.lartc.org/howto/
-Most of those documents have not been actively expanded since early or mid 2000's though,
-and do not cover any new features. They are also under non-free licenses that make
-them very hard to fork and maintain in case the original maintainers lose interest
-in maintaining them.
+Historically, community-maintained documentation such as http://policyrouting.org/iproute2-toc.html 
+and https://www.lartc.org/howto/ have filled the documentation void. Unfortunately, most of those documents 
+have not been actively expanded since early or mid 2000s and are woefully out of date. Because of this,
+they are missing a plethora of valuable and exciting new features. Finally, many of these documentation projects 
+were never released under a free license, which makes them almost impossible to fork and maintain in 
+the event that the original maintainer loses interest.
 
-This document aims to provide a comprehensive, easy to use, and free an open source
-guide to iproute2 where network admins can quickly look up how to solve a particular
-problem with the `ip` command, for example add/remove an address, create a routing table,
-create a network namespace and so on.
+This document aims to provide a comprehensive, easy to use, as well as free and open-source
+guide to iproute2. Whether the issue is adding an IP address, network namespace, or manipulating routing tables, 
+there will be simple explanations and examples. It doesn't matter if the network admin is new or has years of experience, 
+is a professional or just a tinkerer, this guide should provide all the documentation needed to solve 
+any problem with the `ip` command.  
 
-Originally it was named "iproute2 cheatsheet", but was renamed to "Task-centered iproute2 manual"
-due to vastly increased size and scope.
+Originally this was named "iproute2 cheatsheet", but was renamed to "Task-centered iproute2 manual"
+as the size and scope expanded.
 
 
 # Primary location and mirroring
