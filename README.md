@@ -35,19 +35,16 @@ as the size and scope expanded.
 The original and primary location of the document is https://baturin.org/docs/iproute2/
 
 The page is bundled with all the JS and CSS it needs, so it's easy to mirror.
-If you decide to mirror it, please make sure to update it automatically from git to avoid
-creating outdated copies.
 
 # Repository structure
 
-This page is preprocessed with [soupault](https://baturin.org/projects/soupault)
+This page is preprocessed with [soupault](https://soupault.neocities.org)
 website generator to create a static ToC with section links that doesn't
 rely on JS.
 
-The page wrapping is in `templates/main.html` and the content is in `site/index.html`.
-For ease of mirroring, a preprocessed copy is kept in `build/index.html`.
+The page source is at `site/index.html`.
 
-If you want to setup a self-updating mirror, fetch the `build/index.html` page.
+To build it, simply run `soupault` in the directory. The processed page will be in `build/index.html`.
 
 # Contributing
 
