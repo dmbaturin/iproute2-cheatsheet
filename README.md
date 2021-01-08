@@ -29,7 +29,6 @@ any problem with the `ip` command.
 Originally this was named "iproute2 cheatsheet", but was renamed to "Task-centered iproute2 manual"
 as the size and scope expanded.
 
-
 # Primary location and mirroring
 
 The original and primary location of the document is https://baturin.org/docs/iproute2/
@@ -39,10 +38,9 @@ The page is bundled with all the JS and CSS it needs, so it's easy to mirror.
 # Repository structure
 
 This page is preprocessed with [soupault](https://soupault.neocities.org)
-website generator to create a static ToC with section links that doesn't
-rely on JS.
+website generator to create a static ToC with section links that doesn't rely on JS.
 
-The page source is at `site/index.html`.
+The content source is in `site/index.md`.
 
 To build it, simply run `soupault` in the directory. The processed page will be in `build/index.html`.
 
