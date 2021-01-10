@@ -1,20 +1,20 @@
-body {
+/* Common styles */
+
+main {
   max-width: 800px;
   margin: auto;
 }
 
-footer { text-align: center; }
+#copyright {
+  text-align: center;
+  margin-top: 10px;
+}
 
 /* Visual styles */
 
 /* Underlined "link here" # symbols next to headings look quite odd, don't they? */
 a.here { text-decoration: none; }
 
-/* Display the expand/collapse triangle button at the same level as list bullets */
-ul.toc { list-style-position: inside; }
-
-/* A list bullet next to an expand button would be some ugly nonsense. */
-li.collapsible { list-style: none; }
 
 /* Make it clear that the expand/collapse triangle symbol is clickable */
 summary { cursor: pointer; }
@@ -27,6 +27,10 @@ hr {
 }
 
 a { color: #09F; }
+
+/* ToC hardly needs list bullets. */
+ul.toc { list-style: none; }
+ul.toc li { margin-top: 0.5em; }
 
 /* Striped background is helpful on screen,
    undesirable in print,
@@ -62,4 +66,27 @@ pre, code, kbd { font-size: 110%; }
 pre, code, sample {
   white-space: pre-wrap;
   hyphens: none;
+}
+
+/* Use a side pane ToC on screens that are wider than they are tall. */
+
+@media (pointer: fine), (orientation: landscape) {
+  #sidebar {
+    width: 26em;
+    overflow: scroll;
+
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+
+    padding-right: 1em;
+  }
+
+  #content-container {
+    /* Margin wider than the sidebar is intentional,
+       so that there's always some space between the sidebar and the content block.
+     */
+    margin-left: 27em;
+  }
 }

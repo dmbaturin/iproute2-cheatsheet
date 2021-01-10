@@ -1,5 +1,3 @@
-# Task-centered iproute2 user guide
-
 ## Overview of iproute2
 
 iproute2 is the Linux networking toolkit that replaced net-tools (ifconfig, vconfig, route, arp etc.). The ip command comes from the iproute2 package, as well as tc and a few others.
@@ -89,8 +87,6 @@ lo               UNKNOWN        127.0.0.1/8 ::1/128
 $ ip --json --brief address show lo
 [{"ifname": "lo", "operstate": "UNKNOWN", "addr_info": [{"local": "127.0.0.1", "prefixlen": 8},{"local": "::1", "prefixlen": 128}]}, {}, {}]
 ```
-
-<h2 id="toc">Table of contents</h2>
 
 <h2 id="ip-address">Address management</h2>
 <hr>
