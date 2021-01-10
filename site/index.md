@@ -1,31 +1,42 @@
 ## Overview of iproute2
 
-iproute2 is the Linux networking toolkit that replaced net-tools (ifconfig, vconfig, route, arp etc.). The ip command comes from the iproute2 package, as well as tc and a few others.
+iproute2 is the Linux networking toolkit that replaced net-tools (`ifconfig`, `vconfig`, `route`, `arp` etc.).
+Most of the networking functionality is unified in the `ip` command. There's also `tc` for managing traffic policies (QoS),
+and `ss` (a `netstat` replacement), but this document is focused on the `ip` part.
 
-Old style network utilities like ifconfig and route are still there just for backwards compatibility and do not provide access to new features like policy-based routing or network namespaces. Recent versions of many GNU/Linux distributions no longer install them by default in all installation flavours.
+iproute2 was originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger.
 
-Note that iproute2 is not new, it has been a standard Linux tool since the early 2000's. It's been included in every distro by default, or at least available from the repos for a very long time.
+#### Why learn "new" commands?
 
-It's a tool that needs learning, but it gives you more control over the Linux networking features and troubleshooting options than the old tools ever could.
+First, iproute2 is not new at all. It's been a standard Linux tool since the early 2000's
+and has been included in every [GNU/]Linux distro by default for a long time.
 
-iproute2 was originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger. 
+Old-style network utilities like `ifconfig` and `route` are still there only for backward compatibility.
+They are no longer actively developed. Recent versions of many GNU/Linux distributions no longer install them by default.
+
+A lot of networking features cannot be configured with the old tools and that list is only growing: VRF, network namespaces, policy-based routing, and so on.
+The `ip` command provides access to all those features. It also offers a more uniform syntax: for example, `ip link set dev eno1 nomaster`
+will work with bridge ports, link aggregation groups, and VRF; while the old approach would make you memorize the syntax of three different commands
+for those tasks.
+
+It's a tool that takes time to learn, but it's a good time investment for every system and network administrator who works with Linux.
 
 ## About this document
 
 Historically, documentation has been a weak side of iproute2. The official man pages list available options but don't give almost any usage examples.
-This need therefore has been addressed by community-provided documentation.
+That need has been addressed by third-party documentation.
 
 This document aims to provide a comprehensive but easy to use guide to the `ip` command. The `ip` command controls almost all network subsystems of the Linux kernel.
-There are more, such as `ss` (`netstat` replacement, fairly straightforward), `tc` (QoS management), but documenting them in this style, especially `tc`, would be a separate big project.
+Documenting `tc` in this style would be a separate big project.
 
-The document is _task-centered_: it tells you how to do different tasks using `ip`, instead of listing available subcommands.
-It was once called a "cheatsheet" for this reason, but has long outgrown the size and scope of a cheat sheet.
+The document is _task-centered_: it tells you how to do different tasks using `ip` instead of listing available subcommands.
+It was once called a "cheatsheet" for this reason but has long outgrown the size and scope of a cheat sheet.
 
 ## Contributing
 
 This document is maintained by [Daniil Baturin](https://www.baturin.org) and distributed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)—a strong copyleft, free culture license.
 
-Contributions are always welcome, you can find the source files at [github.com/dmbaturin/iproute2-cheatsheet](https://github.com/dmbaturin/iproute2-cheatsheet).
+Contributions are always welcome; you can find the source files at [github.com/dmbaturin/iproute2-cheatsheet](https://github.com/dmbaturin/iproute2-cheatsheet).
 
 ```
 git clone https://github.com/dmbaturin/iproute2-cheatsheet.git
@@ -42,16 +53,16 @@ Metasyntactic variables are written in a shell-like syntax, `${something}`. Opti
 
 ## General notes
 
-All commands that change any settings require root privileges. Commands that just display information generally do not require special priviliges.
+All commands that change any settings require root privileges. Commands that just display information generally do not require special privileges.
 
-There are configuration files in `/etc/iproute2`, mainly for assinging symbolic names to network stack entities such as routing tables.
+There are configuration files in `/etc/iproute2`, mainly for assigning symbolic names to network stack entities such as routing tables.
 Those files are re-read every time you run the `ip` command, so you don't need to do anything to apply the changes.
 
 ## Abbreviating commands
 
 Any `ip` command can be abbreviated. For example, `ip address add 192.0.2.1/24 dev eth0` can be written `ip addr a 192.0.2.1/24 dev eth0` or even `ip a a 192.0.2.1/24 dev eth0`.
 
-In some cases you can even omit words. For example, `show` and `list` words are always fine to omit: `ip address` is equivalent to `ip address show` and `ip address list`.
+In some cases, you can even omit words. For example, `show` and `list` words are always fine to omit: `ip address` is equivalent to `ip address show` and `ip address list`.
 
 Note that the abbreviation system is not always consistent. The `dev` keyword in `ip a a 192.0.2.1/24 dev eth0` cannot be abbreviated, even though every other word can be.
 
@@ -67,7 +78,7 @@ It provides the following output options:
 
 <dl>
 <dt><code>-o</code> (<code>--oneline</code>)</dt>
-<dd>Replaces every line break with a back slash. Supported since the earliest versions.</dd>
+<dd>Replaces every line break with a backslash. Supported since the earliest versions.</dd>
 <dt><code>-br</code> (<code>--brief</code>)</dt>
 <dd>Produces a terse, machine-oriented output. Perfect for dissecting with awk/cut. Supported since at least 4.11.</dd>
 <dt><code>-j</code> (<code>--json</code>)</dt>
@@ -91,13 +102,8 @@ $ ip --json --brief address show lo
 <h2 id="ip-address">Address management</h2>
 <hr>
 
-Host address must always be in the "dotted decimal" format, but for the subnet mask you can use
-either a dotted decimal mask or a prefix length value.
-That is, both `192.0.2.10/24` and `192.0.2.10/255.255.255.0` are equally acceptable formats.
-
-Note that iproute2 will not allow you to use a network address for an interface: it must be a host address
-(with a non-zero host part).
-If you are not sure if something is a correct host address, use `ipcalc` or a similar program to check.
+iproute2 accepts both dotted decimal masks and prefix length values.
+That is, both `192.0.2.10/24` and `192.0.2.10/255.255.255.0` are acceptable formats.
 
 <h3 id="ip-address-show">Show all addresses</h3>
 
@@ -172,12 +178,12 @@ Examples:
 ip address add 192.0.2.1/24 dev eth0 label eth0:WANaddress
 ```
 
-Label must start with the interface name followed by a colon due to some backwards compatibility issues, otherwise you'll get an error.
+The label must start with the interface name followed by a colon due to some backward compatibility issues, otherwise you'll get an error.
 Keep the label shorter than sixteen characters, or else you'll get this error: `RTNETLINK answers: Numerical result out of range`.
 
 #### Notes
 
-For IPv6 addresses this command has no effect (address will be added, but without a label).
+For IPv6 addresses, this command has no effect. It will add the address correctly but will ignore the label.
 
 <h3 id="ip-address-delete">Delete an address from an interface</h3>
 
@@ -193,8 +199,9 @@ ip address delete 192.0.2.1/24 dev eth0
 ip address delete 2001:db8::1/64 dev tun1
 ```
 
-Interface name is required. Linux does allow the same address to be configured on multiple interfaces and it has valid use cases
-(in the Cisco world this is known as "unnumbered interfaces").
+An interface name is required—the kernel will not try to automatically guess which interface you want to remove that address from.
+Such a guess would not always be unambiguous: Linux does allow the same address to be configured on multiple interfaces, and it has valid use cases
+(in the Cisco world, this is known as "unnumbered interfaces").
 
 <h3 id="ip-address-flush"> Remove all addresses from an interface</h3>
 
@@ -208,7 +215,7 @@ Examples:
 ip address flush dev eth1
 ```
 
-By default this command removes both IPv4 and IPv6 addresses.
+By default, this command removes both IPv4 and IPv6 addresses.
 If you want to remove only IPv4 or IPv6 addresses, use `ip -4 address flush` or `ip -6 address flush`.
 
 <h3 id="promote-secondaries">Change the primary address</h3>
@@ -234,7 +241,7 @@ This command supports both American (`ip neighbor`) and British (`ip neighbour`)
 ip neighbor show
 ```
 
-All "show" commands support `-4` and `-6` options to view only IPv4 (ARP) or IPv6 (NDP) neighbors. By default all neighbors are displayed.
+All "show" commands support `-4` and `-6` options to view only IPv4 (ARP) or IPv6 (NDP) neighbors. By default, all neighbors are displayed.
 
 <h3 id="ip-neighbor-show-dev">View neighbors for a specific interface</h3>
 
@@ -260,7 +267,7 @@ ip neighbor add ${network address} lladdr ${link layer address} dev ${interface 
 
 Examples: `ip neighbor add 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0`
 
-One use cases for it is a form of datalink layer security. You can disable ARP on an interface complete,
+One use case for it is a form of data link layer security. You can disable ARP on an interface completely
 and add MAC addresses of authorized devices by hand.
 
 <h3 id="ip-neighbor-delete">Delete a neighbor table entry</h3>
@@ -271,7 +278,7 @@ ip neighbor delete ${network address} lladdr ${link layer address} dev ${interfa
 
 Examples: `ip neighbor delete 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0`
 
-Allows you to delete a static entry, or get rid of an automatically learnt entry without flushing the table.
+Allows you to delete a static entry or get rid of an automatically learnt entry without flushing the table.
 
 <h2 id="ip-link">Link management</h2>
 
@@ -279,7 +286,7 @@ Allows you to delete a static entry, or get rid of an automatically learnt entry
 
 Historically, the `ip link` command could not create tunnels (IPIP, GRE etc.), VXLAN links, or L2TPv3 pseudowires.
 Starting from at least iproute2 3.16, it could create anything except L2TPv3 interfaces, and this remains true as of iproute2 5.7. 
-A lot of time old commands for specific interface type are still more convenient to use though.
+A lot of time, old commands for specific interface types are still more convenient to use, though.
 
 Note that the Linux kernel allows arbitrary, even non-ASCII names for network interfaces.
 It's better to stick with alphanumeric because userspace programs (like iptables) may not be so forgiving.
@@ -294,7 +301,7 @@ ip link list
 
 These commands are equivalent.
 
-<h3 id="ip-link-show-dev">Show information about specific link</h3>
+<h3 id="ip-link-show-dev">Show information about a specific link</h3>
 
 ```
 ip link show dev ${interface name}
@@ -324,7 +331,7 @@ ip link set dev eth0 down
 ip link set dev br0 up
 ```
 
-Note: virtual links (tunnels, VLANs etc.) are always created in the "down" state. You need to bring them up to start using them.
+Note: virtual links (tunnels, VLANs, etc.) are always created in the "down" state. You need to bring them up to start using them.
 
 <h3 id="ip-link-set-alias">Set human-readable link description</h3>
 
@@ -352,14 +359,14 @@ Examples: `ip link set dev eth0 name lan`
 
 Note that you can't rename an active interface. You need to [bring it down](#ip-link-set-up-down) before renaming it.
 
-<h3 id="ip-link-set-address">Change link layer address (usually MAC address)</h3>
+<h3 id="ip-link-set-address">Change link-layer address (usually MAC address)</h3>
 
 ```
 ip link set dev ${interface name} address ${address}
 ```
 
-Link layer address is a pretty broad concept. The most known example is the MAC address of an Ethernet device.
-To change a MAC address you would need something like `ip link set dev eth0 address 22:ce:e0:99:63:6f`.
+A link-layer address is a pretty broad concept. The most known example is the MAC address of an Ethernet device.
+To change a MAC address, you would need something like `ip link set dev eth0 address 22:ce:e0:99:63:6f`.
 
 <h3 id="ip-link-set-mtu">Change link MTU</h3>
 
@@ -371,7 +378,8 @@ Examples: `ip link set dev tun0 mtu 1480`
 
 MTU stands for "Maximum Transmission Unit", the maximum size of a frame an interface can transmit at once.
 
-Apart from reducing fragmentation in tunnels, this is also used to increase performance of gigabit ethernet links that support so called "jumbo frames" (frames up to 9000 bytes large).
+Apart from reducing fragmentation in tunnels, this is also used to increase the performance of gigabit ethernet links
+that support so-called "jumbo frames" (frames up to 9000 bytes large).
 If all your equipment supports gigabit ethernet, you may want to do something like `ip link set dev eth0 mtu 9000`.
 
 Note that you may need to configure it on your L2 switches too, some of them have jumbo frames disabled by default.
@@ -404,10 +412,10 @@ ip link set ${interface name} arp off
 ```
 
 One may want to disable ARP to enforce a security policy and allow only specific MACs to communicate with the interface.
-In this case neighbor table entries for whitelisted MACs should be [created manually](#ip-neighbor-add),
+In this case, neighbor table entries for whitelisted MACs should be [created manually](#ip-neighbor-add),
 or nothing will be able to communicate with that interface.
 
-In most cases it's better to configure MAC policy on an access layer switch though. Do not change this flag unless you are sure what you are going to do and why.
+In most cases, it's better to configure MAC policy on an access layer switch, though. Do not change this flag unless you are sure what you are going to do and why.
 
 <h3 id="ip-link-add-vlan">Create a VLAN interface</h3>
 
@@ -417,7 +425,7 @@ ip link add name ${VLAN interface name} link ${parent interface name} type vlan 
 
 Examples: `ip link add name eth0.110 link eth0 type vlan id 110`
 
-The only type of VLAN supported by Linux is IEEE 802.1q VLAN, legacy implementations like ISL are not supported.
+The only type of VLAN supported by Linux is IEEE 802.1q VLAN; legacy implementations like ISL are not supported.
 
 You can use any name for a VLAN interface. `eth0.110` is a traditional format, but it's not required.
 
@@ -444,13 +452,13 @@ The common use case for it is like this: suppose you are a service provider and 
 to connect parts of their network to each other.
 They use multiple VLANs in their network, so an ordinary rented VLAN is not an option.
 With QinQ you can add a second tag to the customer traffic when it enters your network and remove that tag when it exits,
-so there are no conflicts and you don't need to waste VLAN numbers.
+so there are no conflicts, and you don't need to waste VLAN numbers.
 
 The service tag is a VLAN tag the provider uses to carry client traffic through their network.
 The client tag is a tag set by the customer.
 
-Note that link MTU for the client VLAN interface is not adjusted automatically, you need to take care of it yourself
-and either decrease the client interface MTU by at least 4 bytes, or increase the parent MTU accordingly.
+Note that link MTU for the client VLAN interface is not adjusted automatically; you need to take care of it yourself
+and either decrease the client interface MTU by at least 4 bytes or increase the parent MTU accordingly.
 
 Standards-compliant QinQ is available since Linux 3.10.
 
@@ -475,12 +483,12 @@ ip link add name ${dummy interface name} type dummy
 
 Examples: `ip link add name dummy0 type dummy`
 
-In Linux, for some strange historical reasons, there's only one loopback interfaces.
+In Linux, for some strange historical reasons, there's only one loopback interface.
 Dummy interfaces are like loopbacks, but there can be many of them.
 
 They can be used for communication inside a single host.
-On a router with multiple physical interfaces, a loopback or a dummy interface is also a good place
-to assign a management address.
+A loopback or a dummy interface is also a good place to assign a management address
+on a router with multiple physical interfaces.
 
 <h3 id="ip-link-add-bridge">Create a bridge interface</h3>
 
@@ -492,10 +500,10 @@ Examples: `ip link add name br0 type bridge`
 
 Bridge interfaces are virtual Ethernet switches.
 You can use them to turn a Linux box into a slow L2 switch, or to enable communication between virtual machines on a hypervisor host.
-Note that turning a Linux box into a physical switch isn't a completely absurd idea, since unlike dumb hardware switches it
+Note that turning a Linux box into a physical switch isn't a completely absurd idea, since unlike dumb hardware switches, it
 can work as a transparent firewall.
 
-You can assign an IP address to a bridge and it will be visible from all bridge ports.
+You can assign an IP address to a bridge and, it will be visible from all bridge ports.
 
 If bridge creation fails, check if the `bridge` module is loaded.
 
@@ -507,7 +515,7 @@ ip link set dev ${interface name} master ${bridge name}
 
 Examples: `ip link set dev eth0 master br0`
 
-Interface you add to a bridge becomes a virtual switch port. It operates only on the datalink layer and ceases all network layer operation.
+An interface you add to a bridge becomes a virtual switch port. It operates only on the data link layer and ceases all network layer operation.
 
 <h3 id="ip-link-set-nomaster">Delete a bridge port</h3>
 
@@ -539,11 +547,11 @@ ip link add ${interface name} type ifb
 Example: `ip link add ifb10 type ifb`
 
 Intermediate functional block devices are used for traffic redirection and mirroring in conjunction with `tc`.
-This is also far beyond the scope of this document, consult the `tc` documentation.
+This is also far beyond the scope of this document; consult the `tc` documentation.
 
 <h3 id="ip-link-add-veth">Create a pair of virtual ethernet devices</h3>
 
-Virtual ethernet (veth) devices always come in pairs and work as a bidirectional pipe: whatever comes into one of them, comes out of the other.
+Virtual ethernet (veth) devices always come in pairs and work as a bidirectional pipe: whatever comes into one of them comes out of the other.
 They are used in conjunction with system partitioning features such as network namespaces and containers (OpenVZ or LXC) for connecting one partition to another.
 
 ```
@@ -559,7 +567,7 @@ Note: virtual ethernet devices are created in the UP state, no need to bring the
 Link groups are similar to port ranges found in managed switches.
 You can add network interfaces to a numbered group and perform operations on all the interfaces from that group at once.
 
-Links not assigned to any group belong to the group 0 aka "default".
+Links not assigned to any group belong to group 0 ("default").
 
 <h3 id="ip-link-set-group">Add an interface to a group</h3>
 
@@ -589,7 +597,7 @@ Examples: `ip link set dev tun10 group 0`
 <h3 id="ip-link-set-group-name">Assign a symbolic name to a group</h3>
 
 Group names are configured in the `/etc/iproute2/group` file.
-Symbolic name "default" for the group 0 isn't an iproute2 built-in, it comes from the default group config file.
+The symbolic name "default" for group 0 isn't an iproute2 built-in; it comes from the default group config file.
 You can add your own, one per line, following the same `${number} ${name}` format. You can have up to 255 named groups.
 
 Once you configured a group name, its number and name can be used interchangeably in `ip` commands.
@@ -600,7 +608,7 @@ Example:
 echo "10    customer-vlans" >> /etc/iproute2/group
 ```
 
-After that you can use that name in all operations, like this:
+After that, you can use that name in all operations, like this:
 
 ```
 ip link set dev eth0.100 group customer-vlans
@@ -636,11 +644,11 @@ ip address show group customers
 <hr>
 
 TUN and TAP devices allow userspace programs to emulate a network device.
-The difference between the two is that TAP deviced work with Ethernet frames (L2 device),
+The difference between the two is that TAP devices work with Ethernet frames (L2 device),
 while TUN works with IP packets (L3 device).
 
 There are two types of TUN/TAP devices: persistent and transient.
-Transient TUN/TAP devices are created by userspace programs when they open a special device, and are destroyed automatically when the associated file descriptor is closed.
+Transient TUN/TAP devices are created by userspace programs when they open a special device and are destroyed automatically when the associated file descriptor is closed.
 Persistent devices are created with `ip` commands documented below.
 
 <h3 id="ip-tuntap-show">View TUN/TAP devices</h3>
@@ -681,7 +689,7 @@ ip tuntap add dev tun1 mode tun user me group mygroup
 ip tuntap add dev tun2 mode tun user 1000 group 1001
 ```
 
-<h3 id="ip-tuntap-add-pi">Add an TUN/TAP device using an alternate packet format</h3>
+<h3 id="ip-tuntap-add-pi">Add a TUN/TAP device using an alternate packet format</h3>
 
 Add meta information to each packet received over the file descriptor.
 Very few programs expect this information, and programs that don't expect it will not function correctly with a device in this mode.
@@ -721,11 +729,11 @@ Note: you must specify the mode. The mode is not displayed in `ip link show`, so
 
 ## Tunnel management
 
-Tunnels are "network wormholes" that allow emulating a direct connection over a routed network, by encapculating entire packets into another protocol.
+Tunnels are "network wormholes" that emulate a direct connection over a routed network by encapsulating entire packets into another protocol.
 
 Linux currently supports IPIP (IPv4 in IPv4), SIT (IPv6 in IPv4), IP6IP6 (IPv6 in IPv6), IPIP6 (IPv4 in IPv6), GRE (virtually anything in anything), and VTI (IPv4 in IPsec).
 
-Note that tunnels are created in the DOWN state, you need to bring them up.
+Note that tunnels are created in the DOWN state; you need to bring them up.
 
 In this section `${local endpoint address}` and `${remote endpoint address}` refer to addresses assigned to physical interfaces,
 while `${address}` refers to an address assigned to a tunnel interface.
@@ -746,7 +754,7 @@ ip link set dev tun0 up
 ip address add 10.0.0.1/30 dev tun0
 ```
 
-<h3 id="ip-tunnel-add-sit">Create a SIT tunnel</h3>
+<h3 id="ip-tunnel-add-sit">Create an SIT (6in4) tunnel</h3>
 
 ```
 ip tunnel add ${interface name} mode sit local ${local endpoint address} remote ${remote endpoint address}
@@ -762,8 +770,8 @@ ip link set dev tun9 up
 ip address add 2001:db8:1::1/64 dev tun9
 ```
 
-This type of tunnels is commonly used to provide an IPv4-connected network with IPv6 connectivity.
-There are so called "tunnel brokers" that provide it to everyone interested, e.g. Hurricane Electric's tunnelbroker.net.
+This type of tunnel is commonly used to provide an IPv4-connected network with IPv6 connectivity.
+There are so-called "tunnel brokers" that provide it to everyone interested, e.g., Hurricane Electric's tunnelbroker.net.
 
 <h3 id="ip-tunnel-add-ipip6">Create an IPIP6 tunnel</h3>
 
@@ -773,7 +781,7 @@ ip -6 tunnel add ${interface name} mode ipip6 local ${local endpoint address} re
 
 Examples: `ip -6 tunnel add tun8 mode ipip6 local 2001:db8:1::1 remote 2001:db8:1::2`
 
-This type of tunnels will be widely used only when transit operators phase IPv4 out (i.e. not any soon).
+This type of tunnel will be widely used only when transit operators phase IPv4 out (i.e., not any soon).
 
 <h3 id="ip-tunnel-add-ip6ip6">Create an IP6IP6 tunnel</h3>
 
@@ -795,12 +803,12 @@ Just like IPIP6 these ones aren't going to be widely used any soon.
 
 <h3 id="ip-tunnel-add-gretap">Create an L2 GRE tunnel device</h3>
 
-Static GRE tunnels are tradionally used for encapsulating IPv4 or IPv6 packets,
+Static GRE tunnels are traditionally used for encapsulating IPv4 or IPv6 packets,
 but the [RFC](https://tools.ietf.org/html/rfc2784) does not limit GRE payloads to L3 protocol packets.
 It's possible to encapsulate anything, including Ethernet frames.
 
 However, in Linux, the `gre` encapsulation refers specifically to L3 devices,
-while for an L2 device capable of transmitting Ethernet frames you need to use `gretap`.
+while for an L2 device capable of transmitting Ethernet frames, you need to use the `gretap` encapsulation.
 
 ```
 # L2 GRE over IPv4
@@ -838,12 +846,12 @@ ip address add 192.168.0.1/30 dev tun6
 ip address add 2001:db8:1::1/64 dev tun6
 ```
 
-GRE can encapsulate both IPv4 and IPv6 at the same time. However, by default it uses IPv4 for transport, for GRE over IPv6 there is a separate tunnel mode, `ip6gre`.
+GRE can encapsulate both IPv4 and IPv6 at the same time. However, by default, it uses IPv4 for transport, for GRE over IPv6 there is a separate tunnel mode, `ip6gre`.
 
 <h3 id="ip-tunnel-add-gre-key">Create multiple GRE tunnels to the same endpoint</h3>
 
-[RFC2890](https://tools.ietf.org/html/rfc2890) defines "keyed" GRE tunnels. A "key" in this case has nothing to do with encryption,
-it's simply an identifier that allows routers to tell one tunnel from another, so you can setup multiple tunnels between the same endpoints.
+[RFC2890](https://tools.ietf.org/html/rfc2890) defines "keyed" GRE tunnels. A "key" in this case has nothing to do with encryption;
+it's simply an identifier that allows routers to tell one tunnel from another, so you can create multiple tunnels between the same endpoints.
 
 ```
 ip tunnel add ${interface name} mode gre local ${local endpoint address} remote ${remote endpoint address} key ${key value}
@@ -857,7 +865,7 @@ ip tunnel add tun4 mode gre local 192.0.2.1 remote 203.0.113.6 key 123
 ip tunnel add tun5 mode gre local 192.0.2.1 remote 203.0.113.6 key 124
 ```
 
-You can also specify keys in a dotted decimal IPv4-like format.
+You can also specify keys in a dotted-decimal IPv4-like format.
 
 <h3 id="ip-tunnel-add-gre-multipoint">Create a point-to-multipoint GRE tunnel</h3>
 
@@ -879,13 +887,13 @@ Note the absence of `${remote endpoint address}`. This is the same as "mode gre 
 
 In the absence of a remote endpoint address, the key is the only way to identify the tunnel traffic, so `${key value}` is required.
 
-This type of tunnels allows you to communicate with multiple endpoints by using the same tunnel interface.
+This type of tunnel allows you to communicate with multiple endpoints by using the same tunnel interface.
 It's commonly used in complex VPN setups with multiple endpoints communicating to one another (in Cisco terminology, "dynamic multipoint VPN").
 
-Since there is no explicit remote endpoint address, obviously it is not enough to just create a tunnel. Your system needs to know where the other endpoints are.
-In real life NHRP (Next Hop Resolution Protocol) is used for it.
+Since there is no explicit remote endpoint address, it is obviously not enough to just create a tunnel. Your system needs to know where the other endpoints are.
+In real life, NHRP (Next Hop Resolution Protocol) is used for it.
 
-For testing you can add peers manually (given remote endpoint uses 203.0.113.6 address on its physical interface and 10.0.0.2 on the tunnel):
+For testing, you can add peers manually (given remote endpoint uses 203.0.113.6 address on its physical interface and 10.0.0.2 on the tunnel):
 
 ```
 ip neighbor add 10.0.0.2 lladdr 203.0.113.6 dev tun8
@@ -915,7 +923,7 @@ ip tunnel del ${interface name}
 
 Examples: `ip tunnel del gre1`
 
-Note that in older iproute2 versions this command did not support the full `delete` syntax, only `del`.
+Note that in older iproute2 versions, this command did not support the full `delete` syntax, only `del`.
 Recent versions allow both full and abbreviated forms (tested in iproute2-ss131122).
 
 <h3 id="ip-tunnel-change">Modify a tunnel</h3>
@@ -932,7 +940,7 @@ ip tunnel change tun0 remote 203.0.113.89
 ip tunnel change tun10 key 23456
 ```
 
-Note: Apparently you can't add a key to a previously unkeyed tunnel. Not sure if it's a bug or a feature.
+Note: Apparently, you can't add a key to a previously unkeyed tunnel. Not sure if it's a bug or a feature.
 Also, you can't change tunnel mode on the fly, for obvious reasons.
 
 <h3 id="ip-tunnel-show">View tunnel information</h3>
@@ -956,12 +964,12 @@ tun99: gre/ip  remote 10.46.1.20  local 10.91.19.110  ttl inherit
 
 [L2TPv3](https://tools.ietf.org/html/rfc3931) is a tunneling protocol commonly used for L2 pseudowires.
 
-In many distros L2TPv3 is compiled as a module, and may not be loaded by default.
+In many distros, L2TPv3 is compiled as a module and may not be loaded by default.
 If running any `ip l2tp` command produces errors like  `RTNETLINK answers: No such file or directory` and `Error talking to the kernel`,
 you need to load `l2tp_netlink` and `l2tp_eth` kernel modules. If you want to use L2TPv3 over IP rather than over UDP, also load `l2tp_ip`.
 
 Compared to other tunneling protocol implementations in Linux, L2TPv3 terminology is somewhat backwards.
-You create a _tunnel_, and then bind _sessions_ to it. You can bind multiple sessions with different identifiers to the same tunnel.
+You create a _tunnel_ and then bind _sessions_ to it. You can bind multiple sessions with different identifiers to the same tunnel.
 Virtual network interfaces (by default named `l2tpethX`) are associated with _sessions_ rather than _tunnels_.
 
 #### Note
@@ -1029,7 +1037,7 @@ peer_session_id 10
 
 Notes: `tunnel_id` value must match the value of an existing tunnel (iproute2 will not create a tunnel if it doesn't exist). Session identifiers on both endpoints must match.
 
-Once you create a tunnel and a session, an `l2tpethX` interface will appear, in a DOWN state.
+Once you create a tunnel and a session, an `l2tpethX` interface will appear in a DOWN state.
 Change the state to [UP](#ip-link-set-up-down) and bridge it with another interface or assign an address to it.
 
 <h3 id="ip-l2tp-del-session">Delete an L2TPv3 session</h3>
@@ -1078,11 +1086,11 @@ Examples: `ip l2tp show session session_id 1 tunnel_id 12`
 VXLAN is a tunneling protocol designed for distributed switched networks. It's often used in virtualization setups to decouple the virtual network topology
 from that of the underlying physical network.
 
-VXLAN can work in either multicast or unicast mode, and supports isolating virtual networks using a VNI (virtual network identifier),
+VXLAN can work in either multicast or unicast mode and supports isolating virtual networks using a VNI (virtual network identifier),
 similar to VLANs in Ethernet networks.
 
 The downside of the multicast mode is that you will need to use a multicast routing protocol, typically PIM-SM, to get it to work over routed networks,
-but if you get it setup, you don't need to create all VXLAN connections by hand.
+but if you get it set up, you don't need to create all VXLAN connections by hand.
 
 The underlying encapsulation protocol for VXLAN is UDP.
 
@@ -1128,17 +1136,17 @@ After that you need to [bring the link up](#ip-link-set-up-down) and either brid
 <h2 id="ip-route">Route management</h2>
 <hr>
 
-For IPv4 routes, you can use either a prefix length or a dotted decimal subnet mask.
+For IPv4 routes, you can use either a prefix length or a dotted-decimal subnet mask.
 That is, both 192.0.2.0/24 and 192.0.2.0/255.255.255.0 are equally acceptable.
 
 #### Note
 
 The Linux kernel does not keep routes with unreachable next hops.
 If a link goes down, all routes that would use that link are permanently removed from the routing table.
-You may not have noticed this behaviour because in many cases additional software (e.g. NetworkManager or rp-pppoe) takes care of restoring the routes when links go up and down.
+You may not have noticed this behaviour because, in many cases, additional software (e.g. NetworkManager or rp-pppoe) takes care of restoring the routes when links go up and down.
 
 If you are going to use your Linux machine as a router, consider installing a routing protocol suite such as [FreeRangeRouting](https://frrouting.org/) or [BIRD](https://bird.network.cz/).
-They keep track of link states and restore routes when a link goes up after going down. Of course they also allow you to use dynamic routing protocols such as OSPF and BGP.
+They keep track of link states and restore routes when a link goes up after going down. Of course, they also allow you to use dynamic routing protocols such as OSPF and BGP.
 
 <h3 id="ip-route-connected">Connected routes</h3>
 
@@ -1147,10 +1155,10 @@ Some routes appear in the system without explicit configuration ("against your w
 Once you assign an address to an interface, the system calculates its network address and creates a route to that network (this is why the subnet mask is required).
 Such routes are called connected routes.
 
-For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network will be created and the system will know that hosts from that network can be reached directly.
+For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network will be created, and the system will know that hosts from that network can be reached directly.
 
-When an interface goes down, connected routes associated with it are removed. This is used for inaccessible gateway detection so routes through gateways that went inaccessible are removed.
-Same mechanism prevents you from creating routes through inaccessible gateways.
+When an interface goes down, connected routes associated with it are removed. This is used for inaccessible gateway detection, so routes through gateways that went inaccessible are removed.
+The same mechanism prevents you from creating routes through inaccessible gateways.
 
 <h3 id="ip-route-show">View all routes</h3>
 
@@ -1160,7 +1168,7 @@ ip route
 ip route show
 ```
 
-You can use `-4` and `-6` options to view only IPv4 or IPv6 routes. By default only IPv4 routes are displayed. To view IPv6 routes, use `ip -6 route`.
+You can use `-4` and `-6` options to view only IPv4 or IPv6 routes. By default, only IPv4 routes are displayed. To view IPv6 routes, use `ip -6 route`.
 
 <h3 id="ip-route-show-root">View routes to a network and all its subnets</h3>
 
@@ -1181,8 +1189,8 @@ ip route show to match ${address}/${mask}
 
 If you want to view routes to 192.168.0.0/24 and all larger subnets, use `ip route show to match 192.168.0.0/24`.
 
-Routers prefer more specific routes to less specific, so this is often useful for debugging in situations when traffic to specific subnet is sent the wrong way because
-a route to it is missing but routes to larger subnets exist.
+Routers prefer more specific routes to less specific, so this is often useful for debugging in situations when traffic to a specific subnet is sent the wrong way because
+a route to it is missing, but routes to larger subnets exist.
 
 <h3 id="ip-route-show-exact">View routes to an exact subnet</h3>
 
@@ -1201,7 +1209,7 @@ ip route get ${address}/${mask}
 Example: `ip route get 192.168.0.0/24`.
 
 Note that in complex routing scenarios like multipath routing, the result may be "correct but not complete", since  it always shows only one route that will be used first.
-In most situations it's not a problem, but never forget to look at the corresponding "show" command output too.
+In most situations, it's not a problem, but never forget to look at the corresponding "show" command output too.
 
 <h3 id="ip-route-show-cached">View route cache (pre 3.6 kernels only)</h3>
 
@@ -1209,10 +1217,10 @@ In most situations it's not a problem, but never forget to look at the correspon
 ip route show cached
 ```
 
-Until the version 3.6, Linux used route caching. In older kernels, this command displays the contents of the route cache.
-It can be used with modifiers described above. In newer kernels it does nothing.
+Until version 3.6, Linux used route caching. In older kernels, this command displays the contents of the route cache.
+It can be used with modifiers described above. In newer kernels, it does nothing.
 
-<h3 id="ip-route-add-via">Add a route via gateway</h3>
+<h3 id="ip-route-add-via">Add a route via a gateway</h3>
 
 ```
 ip route add ${address}/${mask} via ${next hop}
@@ -1226,7 +1234,7 @@ ip route add 192.0.2.128/25 via 192.0.2.1
 ip route add 2001:db8:1::/48 via 2001:db8:1::1
 ```
 
-<h3 id="ip-route-add-dev">Add a route via interface</h3>
+<h3 id="ip-route-add-dev">Add a route via an interface</h3>
 
 ```
 ip route add ${address}/${mask} dev ${interface name}
@@ -1298,9 +1306,9 @@ Examples: `ip route add blackhole 192.0.2.1/32`.
 
 Traffic to destinations that match a blackhole route is silently discarded.
 
-There are two use cases for blackhole routes. First, they can work as a very fast outbound traffic filter, e.g. to make known botnet controllers inaccessible,
+There are two use cases for blackhole routes. First, they can work as a very fast outbound traffic filter, e.g., to make known botnet controllers inaccessible
 or to protect a server inside your network from an incoming DDoS attack.
-Second, they can be used to trick a routing protocol daemon into thinking you have a route to a network if you only have real routes to its parts,
+Second, they can be used to trick a routing protocol daemon into thinking you have a route to a network if you only have real routes to its parts
 but want to advertise it aggregated.
 
 <h3 id="ip-route-add-special">Other special routes</h3>
@@ -1321,10 +1329,10 @@ These routes make the system discard packets and reply with an ICMP error messag
 * `prohibit`:  Sends ICMP "administratively prohibited". 
 * `throw`: Sends "net unreachable". 
 
-Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g. DDoS) because they generate a reply packet for every discarded packet and thus create an even greater traffic flow.
+Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g., DDoS) because they generate a reply packet for every discarded packet and thus create an even greater traffic flow.
 They can be good for implementing internal access policies, but a firewall is usually a better idea.
 
-"Throw" routes may be used for implementing policy-based routing, in non-default tables they stop the lookup process, but don't send ICMP error messages.
+"Throw" routes may be used for implementing policy-based routing. In non-default, tables they stop the lookup process but don't send ICMP error messages.
 
 <h3 id="ip-route-add-metric">Routes with different metric</h3>
 
@@ -1354,7 +1362,7 @@ ip route add ${addresss}/${mask} nexthop via ${gateway 1} weight ${number} nexth
 ```
 
 Multipath routes make the system balance packets across several links according to the weight (higher weight is preferred, so gateway/interface with weight 2 will get roughly two times more traffic
-than another one with weight 1). You can have as many gateways as you want and you can mix gateway and interface routes:
+than another one with weight 1). You can have as many gateways as you want, and you can mix gateway and interface routes:
 
 ```
 ip route add default nexthop via 192.168.1.1 weight 1 nexthop dev ppp0 weight 10
@@ -1365,7 +1373,7 @@ This is called "asymmetric routing". For routers that simply forward packets and
 and in some cases even unavoidable.
 
 If your system does some local processing (e.g. NAT), this may cause problems with incoming connections.
-In that case you should be using a stateful L4 load balancing setup instead.
+In that case, you should be using a stateful L4 load balancing setup instead.
 
 <h2 id="ip-rule">Policy-based routing</h2>
 <hr>
@@ -1404,7 +1412,7 @@ Numeric table identifiers and names can be used interchangeably. To create your 
 
 `delete`, `change`, `replace`, and all other route actions work with any table too.
 
-`ip route ... table main` or `ip route ... table 254` have an exact same effect as commands without a table part.
+`ip route ... table main` or `ip route ... table 254` have the exact same effect as commands without a table part.
 
 <h3 id="ip-route-show-table">View policy routes</h3>
 
@@ -1420,7 +1428,7 @@ ip route show table 100
 ip route show table test
 ```
 
-Note: in this case you need the `show` word, a shorthand like `ip route table 120` does not work because the command would be ambiguous.
+Note: in this case, you need the `show` word; a shorthand like `ip route table 120` does not work because the command would be ambiguous.
 
 <h3 id="ip-rule-syntax">General rule syntax</h3>
 
@@ -1450,7 +1458,7 @@ ip rule add from 192.0.2.0/24 lookup 10
 ip -6 rule add from 2001:db8::/32 prohibit
 ```
 
-Notes: `all` keyword can be used as shortcut for 0.0.0.0/0 or ::/0
+Notes: `all` keyword can be used as a shortcut for 0.0.0.0/0 or ::/0
 
 <h3 id="ip-rule-add-to">Create a rule to match a destination network</h3>
 
@@ -1486,7 +1494,7 @@ Make sure to set the mark in a firewall chain that is processed before the routi
 You can find an excellent netfilter flowchart in [Phil Hagen's blog](https://stuffphilwrites.com/2014/09/iptables-processing-flowchart/).
 For forwarded traffic, `mangle FORWARD` should be a good place, e.g. `iptables -t mangle -I FORWARD -s 192.0.2.1 -j MARK --set-mark 0x11`.
 
-<h3 id="ip-rule-add-iif">Create a rule to match inbound interface</h3>
+<h3 id="ip-rule-add-iif">Create a rule to match an inbound interface</h3>
 
 ```
 ip rule add iif ${interface name} ${action}
@@ -1502,7 +1510,7 @@ ip rule add iif lo lookup 20
 
 Rules with `iif lo` (loopback) will match locally generated traffic.
 
-<h3 id="ip-rule-add-oif">Create a rule to match outbound interface</h3>
+<h3 id="ip-rule-add-oif">Create a rule to match an outbound interface</h3>
 
 ```
 ip rule add oif ${interface name} ${action}
@@ -1525,7 +1533,7 @@ ip rule add uidrange 1000-1100 lookup 10
 ip rule add uidrange 3000-3000 lookup 20
 ```
 
-To apply a rule to a single user, use the same UID for both start and end of the range.
+To apply a rule to a single user, use the same UID for both the start and end of the range.
 
 <h3 id="ip-rule-add-priority">Set rule priority</h3>
 
@@ -1541,7 +1549,7 @@ ip rule add from 192.0.2.0/25 lookup 10 priority 10
 ip rule add from 192.0.2.0/24 lookup 20 priority 20
 ```
 
-Note: Rules are traversed from the lowest to the highest priority and processing stops on the first match, so you need to put more specific rules before less specific.
+Note: Rules are traversed from the lowest to the highest priority, and processing stops on the first match, so you need to put more specific rules before less specific ones.
 The example above demonstrates rules for 192.0.2.0/24 and its subnet 192.0.2.0/25. If the priorities were reversed and the rule for /25 was placed after the rule for /24, it would never be reached.
 
 <h3 id="ip-rule-show">Show all rules</h3>
@@ -1571,7 +1579,7 @@ ip -6 rule flush
 ```
 
 Notes: this operation is highly disruptive. Even if you have not configured any rules, some fundamental rules like `from all lookup main` rules are created for you by default.
-On an unconfigured machine you can see this:
+On an unconfigured machine, you can see this:
 
 ```
 $ ip rule show
@@ -1584,7 +1592,8 @@ $ ip -6 rule show
 32766:	from all lookup main 
 ```
 
-The `from all lookup local` rule is special and cannot be deleted. The `from all lookup main` is not, there may be valid reasons not to have it, e.g. if you want to route only traffic you created explicit rules for.
+The `from all lookup local` rule is special and cannot be deleted. The `from all lookup main` is not, there may be valid reasons not to have it, e.g.,
+if you want to route only traffic you created explicit rules for.
 As a side effect, if you do `ip rule flush`, that rule will be deleted, which will make the system stop routing any traffic until you restore your rules.
 
 <h2 id="ip-vrf">VRF management</h2>
@@ -1594,7 +1603,7 @@ VRF (Virtual Routing and Forwarding) is a mechanism for isolating routes of a ne
 It allows multiple networks with conflicting address ranges to co-exist in the same router.
 The most common use case for it is multi-tenant setups and provider-supported VPNs where customers can use their own network addresses.
 
-The main difference from policy-based routing is that "normal" non-default tables used in PBR only separate static routes, but not connected routes, so they cannot resolve address conflicts.
+The main difference from policy-based routing is that "normal" non-default tables used in PBR only separate static routes but not connected routes, so they cannot resolve address conflicts.
 When a network interface is bound to a VRF, all connected routes from it will be moved to a separate routing table.
 
 Unlike network namespaces, VRFs work exclusively on the network layer.
@@ -1631,7 +1640,7 @@ ip link set ${interface} master ${vrf}
 Example: `ip link set eth0 master foo`.
 
 All connected routes associated with the interface will be moved to the VRF table.
-For example, if eth0 has address 192.0.2.1/24, and a VRF instance foo uses table 100, then the route to 192.0.2.0/24 will disappear from the main table and re-appear in the table 100.
+For example, if eth0 has address 192.0.2.1/24, and a VRF instance foo uses table 100, then the route to 192.0.2.0/24 will disappear from the main table and re-appear in table 100.
 
 <h3 id="ip-vrf-remove-interface">Remove an interface from a VRF</h3>
 
@@ -1655,7 +1664,7 @@ The traffic of the process will be routed according to the VRF table routes, so 
 <hr>
 
 Network namespaces are isolated network stack instances within a single machine.
-They can be used for security domain separation, managing traffic flows between virtual machines and so on.
+They can be used for security domain separation, managing traffic flows between virtual machines, and so on.
 
 Every namespace is a complete copy of the networking stack with its own interfaces, addresses, routes etc.
 You can run processes inside a namespace and bridge namespaces to physical interfaces.
@@ -1692,7 +1701,7 @@ Example: `ip netns exec foo /bin/sh`.
 
 Note: assigning a process to a non-default namespace requires root privileges.
 
-You can run any processes inside a namespace, in particular you can run `/sbin/ip` itself. Commands like `ip netns exec foo ip link list` in this section are not special:
+You can run any processes inside a namespace, in particular, you can run `/sbin/ip` itself. Commands like `ip netns exec foo ip link list` in this section are not special:
 we are simply executing another copy of `ip` in a namespace. You can run an interactive shell inside a namespace as well.
 
 <h3 id="ip-netns-pids">List all processes assigned to a namespace</h3>
@@ -1721,14 +1730,14 @@ ip link set dev ${interface name} netns ${pid}
 
 Example: `ip link set dev eth0.100 netns foo`.
 
-Note: once you assign an interface to a namespace, it disappears from the default namespace and you will have to perform all operations with it via `ip netns exec ${netspace name}`,
+Note: once you assign an interface to a namespace, it disappears from the default namespace, and you will have to perform all operations with it via `ip netns exec ${netspace name}`,
 like `ip netns exec ${netspace name} ip link set dev dummy0 down`.
 
 Moreover, when you move an interface to another namespace, it loses all existing configuration such as IP addresses configured on it and goes to the DOWN state.
 You'll need to bring it back up and reconfigure it.
 
 If you specify a PID instead of a namespace name, the interface gets assigned to the primary namespace of the process with that PID.
-This way you can reassign an interface back to the default namespace with e.g. `ip netns exec ${namespace name} ip link set dev ${intf} netns 1`
+This way you can reassign an interface back to the default namespace with e.g., `ip netns exec ${namespace name} ip link set dev ${intf} netns 1`
 (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).
 
 <h3 id="ip-netns-veth-connect">Connect one namespace to another</h3>
@@ -1750,10 +1759,10 @@ ip netns exec foo ip address add 10.1.1.1/24 dev veth2
 
 Add an address to veth1, which stays in the default namespace: `ip address add 10.1.1.2/24 dev veth1`.
 
-Now you can ping 10.1.1.1 which is in foo namespace, and setup routes to subnets configured in other interfaces of that namespace.
+Now you can ping 10.1.1.1, which is in the `foo` namespace, and set up routes to subnets configured in other interfaces of that namespace.
 
 If you want switching instead of routing, you can bridge those veth interfaces with other interfaces in corresponding namespaces.
-Same technique can be used for connecting namespaces to physical networks.
+The same technique can be used for connecting namespaces to physical networks.
 
 <h3 id="ip-netns-monitor">Monitor network namespace subsystem events</h3>
 
@@ -1766,7 +1775,7 @@ Displays events such as creation and deletion of namespaces when they occur.
 <h2 id="ip-maddress-mroute">Multicast management</h2>
 <hr>
 
-Multicast is mostly handled by applications and routing daemons, so there is not much you can and should do manually here. Multicast-related `ip` commands are mostly useful for debug.
+Multicast is mostly handled by applications and routing daemons, so there is not much you can and should do manually here. Multicast-related `ip` commands are mostly useful for debugging.
 
 <h3 id="ip-maddress-show">View multicast groups</h3>
 
@@ -1853,7 +1862,7 @@ ip -4 monitor address
 
 <h3 id="rtmon">Read a log file produced by rtmon</h3>
 
-iproute2 includes a program called `rtmon` that serves essentially the same purpose, but writes events to a binary log file instead of displaying them.
+iproute2 includes a program called `rtmon` that serves essentially the same purpose but writes events to a binary log file instead of displaying them.
 You can read those logs file with an `ip monitor` command.
 
 ```
