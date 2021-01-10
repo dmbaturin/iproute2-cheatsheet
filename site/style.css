@@ -28,6 +28,8 @@ hr {
 
 a { color: #09F; }
 
+pre, code, kbd { color: green; }
+
 /* ToC hardly needs list bullets. */
 ul.toc { list-style: none; }
 ul.toc li { margin-top: 0.5em; }
