@@ -50,6 +50,7 @@ ul.toc li { margin-top: 0.5em; }
 body {
   font-family: Helvetica, sans-serif;
   color: #444;
+  background-color: #ffffff;
 }
 
 /* For some reason on most system the default monospace font looks smaller.
