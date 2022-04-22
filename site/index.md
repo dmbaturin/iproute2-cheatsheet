@@ -1250,9 +1250,9 @@ Interface routes are commonly used with point-to-point interfaces like PPP tunne
 ip route add ${address}/${mask} dev ${interface name} onlink
 ```
 
-Example: `ip route add 192.0.2.128/25 via 192.0.1.1 dev eth0 onlink`
+Example: `ip route add 192.0.2.128/25 via 203.0.113.1 dev eth0 onlink`
 
-The onlink keyword disables the kernels gateway consistency checks and allows adding routes via gateways not reachable by netmask lookup.
+The `onlink` keyword disables the kernel's gateway consistency checks and allows adding routes via gateways that look unreachable.
 Useful in tunnel configurations and container/virtualization networking with multiple networks on the same link using a single gateway.
 
 <h3 id="ip-route-change-replace">Change or replace a route</h3>
