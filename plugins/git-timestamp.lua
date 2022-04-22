@@ -80,3 +80,10 @@ message_elem = HTML.parse(timestamp_message)
 timestamp_container = HTML.select_one(page, timestamp_container_selector)
 HTML.append_child(timestamp_container, message_elem)
 
+-- Hack for iproute2-cheatsheet: automatically insert the last modification year
+-- in "Copyright 2013-${modification year}"
+-- Assumes that the timestamp format is YYYY-MM-DD
+
+timestamp_year = Date.reformat(timestamp, {"%F"}, "%Y")
+year_elem = HTML.select_one(page, "#update-year")
+HTML.append_child(year_elem, HTML.create_text(timestamp_year))
