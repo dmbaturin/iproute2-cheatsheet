@@ -560,7 +560,9 @@ ip link add name ${first device name} type veth peer name ${second device name}
 
 Examples: `ip link add name veth-host type veth peer name veth-guest`
 
-Note: virtual ethernet devices are created in the UP state, no need to bring them up manually after creation.
+**Note:** depending on the kernel version, those devices may be created in either down or up state.
+In recent versions (tested in 5.10) they are down. It's better to assume that they are down and always use
+`ip link set ${intf} up` on them.
 
 <h2 id="ip-link-group">Link group management</h2>
 
