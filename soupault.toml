@@ -1,5 +1,5 @@
 # Configuration file for the soupault website generator/HTML processor
-# (see https://soupault.neocities.org/reference-manual/ for details).
+# (see https://soupault.app/reference-manual/ for details).
 
 [settings]
   doctype = "<!DOCTYPE html>"
@@ -119,13 +119,9 @@
 # ...
 [widgets.wrap-subsections]
   widget = "wrap-sections"
-
   selector = "main"
-
   wrapper_element = "div"
-
   level = 3
-
   class = "subsection"
 
 # Same, but for the <h2> level
@@ -135,15 +131,10 @@
 # that ends up colored differently.
 # The only way to prevent that is to make all subsection elements children of a single parent.
 [widgets.wrap-sections]
-  #after = "wrap-subsections"
   widget = "wrap-sections"
-
   selector = "main"
-
   wrapper_element = "div"
-
   level = 2
-
   class = "section"
 
 # goatcounter.com provides a privacy-respecting stats collection service
