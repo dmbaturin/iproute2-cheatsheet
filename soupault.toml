@@ -5,6 +5,10 @@
   doctype = "<!DOCTYPE html>"
   generator_mode = true
 
+  # Soupault templates are really just empty HTML pages
+  # so don't be surprised that it has no {{template tags}} or anything.
+  # Soupault inserts content into the empty page skeleton
+  # by manipulating its element tree instead.
   default_template_file = "templates/main.html"
 
   # Content from site/index.md is inserted in the <main>
@@ -52,7 +56,7 @@
   valid_html = true
 
 # Sets the page <title> to the content of its first <h1>
-# to avoid duplication.
+# to avoid having to write the title by hand
 [widgets.set-title]
   widget = "title"
   selector = "h1"
@@ -61,7 +65,7 @@
 # This widget comes from plugins/collapsible-list.lua
 #
 # It converts nested <ul>/<ol> elements to a tree with foldable nodes
-# using HTML5 <defails>/<summary> elements.
+# using HTML5 <details>/<summary> elements.
 [widgets.toc-collapse]
   after = "toc"
   widget = "collapsible-list"
@@ -69,12 +73,12 @@
 
 # This widget comes from plugins/inline-assets.lua
 #
-# It inline all external assets, e.g.
-# Converts <link rel="stylesheet"> to inline <style>
+# It inlines all external assets, e.g.,
+# converts <link rel="stylesheet"> to inline <style>
 # and inlines images as Base64.
 #
-# This allows the generated page to be truly standalone,
-# without sacrificing convenience of external files for development.
+# This allows the generated page to be truly standalone
+# without sacrificing the convenience of external files for development.
 [widgets.inline-assets]
   widget = "inline-assets"
   delete_files = true
@@ -83,18 +87,12 @@
 # This widget comes from plugins/git-timestamp.lua
 #
 # It retrieves the date when site/index.md was last modified
-# from the git commit history.
+# from the git commit history and inserts it in the page.
 [widgets.insert-timestamp-from-git]
   widget = "git-timestamp"
   timestamp_container_selector = "#last-modified"
   timestamp_format = '<time id="revision">%s</time>'
   git_date_format = "short"
-
-  # Do not do anything if a page has a <time id="revision"> elements
-  # created by hand.
-  # Useful to avoid re-generating timestamp on non-essential mionr or technical edits.
-  manual_timestamp_selector = "#revision"
-
 
 # Having chunks of the page wrapped in <div> or some other block elements
 # make styling a lot simpler.
