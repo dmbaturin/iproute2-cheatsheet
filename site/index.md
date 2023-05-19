@@ -99,7 +99,7 @@ $ ip --json --brief address show lo
 [{"ifname": "lo", "operstate": "UNKNOWN", "addr_info": [{"local": "127.0.0.1", "prefixlen": 8},{"local": "::1", "prefixlen": 128}]}, {}, {}]
 ```
 
-<h2 id="ip-address">Address management</h2>
+<h2 id="ip-address">IPv4 and IPv6 address management</h2>
 <hr>
 
 iproute2 accepts both dotted decimal masks and prefix length values.
@@ -564,7 +564,7 @@ Examples: `ip link add name veth-host type veth peer name veth-guest`
 In recent versions (tested in 5.10) they are down. It's better to assume that they are down and always use
 `ip link set ${intf} up` on them.
 
-<h2 id="ip-link-group">Link group management</h2>
+<h2 id="ip-link-group">Link groups</h2>
 
 Link groups are similar to port ranges found in managed switches.
 You can add network interfaces to a numbered group and perform operations on all the interfaces from that group at once.
@@ -729,7 +729,7 @@ ip tuntap delete dev tap1 mode tap
 
 Note: you must specify the mode. The mode is not displayed in `ip link show`, so if you don't know if it's a TUN or a TAP device, consult the output of `ip tuntap show`.
 
-## Tunnel management
+## Tunnel interfaces
 
 Tunnels are "network wormholes" that emulate a direct connection over a routed network by encapsulating entire packets into another protocol.
 
@@ -961,7 +961,7 @@ $ ip tun show tun99
 tun99: gre/ip  remote 10.46.1.20  local 10.91.19.110  ttl inherit 
 ```
           
-<h2 id="ip-l2tp">L2TPv3 pseudowire management</h2>
+<h2 id="ip-l2tp">L2TPv3 pseudowires</h2>
 <hr>
 
 [L2TPv3](https://tools.ietf.org/html/rfc3931) is a tunneling protocol commonly used for L2 pseudowires.
@@ -1082,7 +1082,7 @@ tunnel_id ${tunnel identifier}
           
 Examples: `ip l2tp show session session_id 1 tunnel_id 12`
 
-<h2 id="ip-link-vxlan">VXLAN management</h2>
+<h2 id="ip-link-vxlan">VXLAN</h2>
 <hr>
 
 VXLAN is a tunneling protocol designed for distributed switched networks. It's often used in virtualization setups to decouple the virtual network topology
@@ -1135,7 +1135,7 @@ ip link add name vxlan0 type vxlan \
 
 After that you need to [bring the link up](#ip-link-set-up-down) and either bridge it with another interface or assign an address to it.
 
-<h2 id="ip-route">Route management</h2>
+<h2 id="ip-route">Routeing tables</h2>
 <hr>
 
 For IPv4 routes, you can use either a prefix length or a dotted-decimal subnet mask.
@@ -1609,7 +1609,7 @@ The `from all lookup local` rule is special and cannot be deleted. The `from all
 if you want to route only traffic you created explicit rules for.
 As a side effect, if you do `ip rule flush`, that rule will be deleted, which will make the system stop routing any traffic until you restore your rules.
 
-<h2 id="ip-vrf">VRF management</h2>
+<h2 id="ip-vrf">VRF</h2>
 <hr>
 
 VRF (Virtual Routing and Forwarding) is a mechanism for isolating routes of a network in a separate routing table.
@@ -1673,7 +1673,7 @@ Example: `ip vrf exec ping 192.0.2.100`.
 
 The traffic of the process will be routed according to the VRF table routes, so it's useful for troubleshooting.
 
-<h2 id="ip-netns">Network namespace management</h2>
+<h2 id="ip-netns">Network namespaces</h2>
 <hr>
 
 Network namespaces are isolated network stack instances within a single machine.
@@ -1785,7 +1785,7 @@ ip netns monitor
 
 Displays events such as creation and deletion of namespaces when they occur.
 
-<h2 id="ip-maddress-mroute">Multicast management</h2>
+<h2 id="ip-maddress-mroute">Multicast groups and routes</h2>
 <hr>
 
 Multicast is mostly handled by applications and routing daemons, so there is not much you can and should do manually here. Multicast-related `ip` commands are mostly useful for debugging.
