@@ -99,7 +99,7 @@ $ ip --json --brief address show lo
 [{"ifname": "lo", "operstate": "UNKNOWN", "addr_info": [{"local": "127.0.0.1", "prefixlen": 8},{"local": "::1", "prefixlen": 128}]}, {}, {}]
 ```
 
-<h2 id="ip-address">IPv4 and IPv6 address management</h2>
+<h2 id="ip-address">IPv4 and IPv6 addresses</h2>
 <hr>
 
 iproute2 accepts both dotted decimal masks and prefix length values.
@@ -230,7 +230,7 @@ This setting varies between Linux distributions, so be careful to check it befor
 
 Secondary IPv6 addresses are always promoted to primary if a primary address is deleted.
      
-<h2 id="ip-neighbor">Neighbor (ARP and NDP) table management</h2>
+<h2 id="ip-neighbor">Neighbor (ARP and NDP) tables</h2>
 <hr>
 
 This command supports both American (`ip neighbor`) and British (`ip neighbour`) spelling variants.
@@ -280,7 +280,7 @@ Examples: `ip neighbor delete 192.0.2.1 lladdr 22:ce:e0:99:63:6f dev eth0`
 
 Allows you to delete a static entry or get rid of an automatically learnt entry without flushing the table.
 
-<h2 id="ip-link">Link management</h2>
+<h2 id="ip-link">Network links</h2>
 
 "Link" is another term for a network interface. Commands from the `ip link` family perform operations that are common for all interface types, like viewing link information or changing the MTU.
 
@@ -1421,7 +1421,7 @@ ip route add 0.0.0.0/0 via 192.168.0.1 table ISP2
 ip route add 2001:db8::/48 dev eth1 table 100
 ```
 
-Note: You can use any route options described in the [route management](#ip-route) section for policy routes too,
+Note: You can use any route options described in the [routing tables](#ip-route) section for policy routes too,
 the only difference is the `table ${table id/name}` part at the end.
 
 Numeric table identifiers and names can be used interchangeably. To create your own symbolic names, edit the `/etc/iproute2/rt_tables` config file.
