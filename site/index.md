@@ -1135,7 +1135,7 @@ ip link add name vxlan0 type vxlan \
 
 After that you need to [bring the link up](#ip-link-set-up-down) and either bridge it with another interface or assign an address to it.
 
-<h2 id="ip-route">Routeing tables</h2>
+<h2 id="ip-route">Routing tables</h2>
 <hr>
 
 For IPv4 routes, you can use either a prefix length or a dotted-decimal subnet mask.
@@ -1145,7 +1145,7 @@ That is, both 192.0.2.0/24 and 192.0.2.0/255.255.255.0 are equally acceptable.
 
 The Linux kernel does not keep routes with unreachable next hops.
 If a link goes down, all routes that would use that link are permanently removed from the routing table.
-You may not have noticed this behaviour because, in many cases, additional software (e.g. NetworkManager or rp-pppoe) takes care of restoring the routes when links go up and down.
+You might not have noticed that behaviour because, in many cases, additional software (e.g., NetworkManager or rp-pppoe) takes care of restoring routes when links go up and down.
 
 If you are going to use your Linux machine as a router, consider installing a routing protocol suite such as [FreeRangeRouting](https://frrouting.org/) or [BIRD](https://bird.network.cz/).
 They keep track of link states and restore routes when a link goes up after going down. Of course, they also allow you to use dynamic routing protocols such as OSPF and BGP.
@@ -1159,7 +1159,8 @@ Such routes are called connected routes.
 
 For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network will be created, and the system will know that hosts from that network can be reached directly.
 
-When an interface goes down, connected routes associated with it are removed. This is used for inaccessible gateway detection, so routes through gateways that went inaccessible are removed.
+When an interface goes down, connected routes associated with it are removed and all routes who gateway belong to the now-inaccessible networks are removed as well
+because they fail gateway reachability check.
 The same mechanism prevents you from creating routes through inaccessible gateways.
 
 <h3 id="ip-route-show">View all routes</h3>
@@ -1210,8 +1211,8 @@ ip route get ${address}/${mask}
 
 Example: `ip route get 192.168.0.0/24`.
 
-Note that in complex routing scenarios like multipath routing, the result may be "correct but not complete", since  it always shows only one route that will be used first.
-In most situations, it's not a problem, but never forget to look at the corresponding "show" command output too.
+Note that this command always returns exactly one route. In most cases it's not a problem, but in multi-path routing setups
+the result may not reflect the complete picture, so don't forget to look at the corresponding "show" command output as well.
 
 <h3 id="ip-route-show-cached">View route cache (pre 3.6 kernels only)</h3>
 
@@ -1244,7 +1245,9 @@ ip route add ${address}/${mask} dev ${interface name}
 
 Example: `ip route add 192.0.2.0/25 dev ppp0`
 
-Interface routes are commonly used with point-to-point interfaces like PPP tunnels where a next hop address is not required.
+Interface routes are commonly used with point-to-point interfaces like PPP tunnels.
+Since there is no chance that more than one host is connected to a point-to-point interface,
+there's also no need to specify the gateway address explicitly in those cases.
 
 <h3 id="ip-route-add-onlink">Add a route without consistency check for gateway reachability</h3>
 
@@ -1255,7 +1258,7 @@ ip route add ${address}/${mask} dev ${interface name} onlink
 Example: `ip route add 192.0.2.128/25 via 203.0.113.1 dev eth0 onlink`
 
 The `onlink` keyword disables the kernel's gateway consistency checks and allows adding routes via gateways that look unreachable.
-Useful in tunnel configurations and container/virtualization networking with multiple networks on the same link using a single gateway.
+Useful in tunnel configurations and container/virtualization networking where multiple networks on the same link use a single gateway.
 
 <h3 id="ip-route-change-replace">Change or replace a route</h3>
 
@@ -1321,7 +1324,7 @@ Traffic to destinations that match a blackhole route is silently discarded.
 
 There are two use cases for blackhole routes. First, they can work as a very fast outbound traffic filter, e.g., to make known botnet controllers inaccessible
 or to protect a server inside your network from an incoming DDoS attack.
-Second, they can be used to trick a routing protocol daemon into thinking you have a route to a network if you only have real routes to its parts
+Second, they can be used to trick a routing protocol daemon into thinking that you have a route to a network if you only have real routes to its parts,
 but want to advertise it aggregated.
 
 <h3 id="ip-route-add-special">Other special routes</h3>
@@ -1347,7 +1350,7 @@ They can be good for implementing internal access policies, but a firewall is us
 
 "Throw" routes may be used for implementing policy-based routing. In non-default, tables they stop the lookup process but don't send ICMP error messages.
 
-<h3 id="ip-route-add-metric">Routes with different metric</h3>
+<h3 id="ip-route-add-metric">Routes with different metrics</h3>
 
 ```
 ip route add ${address}/${mask} via ${gateway} metric ${number}
