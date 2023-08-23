@@ -349,6 +349,27 @@ Link aliases show up in the `ip link show` output, like this:
     alias LAN interface
 ```
 
+<h3 id="ip-link-property-altname">Add link alternative names</h3>
+
+The kernel limits the length of link names to 15 characters. In order to
+overcome this limitation, alternative names can be added to a link.
+
+```
+ip link property add dev ${interface name} altname ${alternative name}
+```
+
+Examples: `ip link property add dev eth0 altname eno1 altname enp3s0`
+
+Alternative names can be used to refer to the link in iproute commands.
+
+```
+$ ip link show eno1
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:11:af:63 brd ff:ff:ff:ff:ff:ff
+    altname eno1
+    altname enp3s0
+```
+
 <h3 id="ip-link-set-name">Rename an interface</h3>
 
 ```
