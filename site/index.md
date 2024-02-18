@@ -1739,7 +1739,7 @@ Example: `ip netns exec foo /bin/sh`.
 Note: assigning a process to a non-default namespace requires root privileges.
 
 You can run any processes inside a namespace, including an interactive shell.
-If you want to run `/sbin/ip` itself in another namespace, you can use either
+If you want to run `ip` itself in another namespace, you can use either
 `ip netns exec ${namespace name} ip ${ip subcommand}` (same as with any other
 command), or the `-n`/`-netns` shortcut:
 `ip -n ${namespace name} ${ip subcommand}`.
