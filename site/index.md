@@ -804,7 +804,7 @@ ip -6 tunnel add ${interface name} mode ipip6 local ${local endpoint address} re
 
 Examples: `ip -6 tunnel add tun8 mode ipip6 local 2001:db8:1::1 remote 2001:db8:1::2`
 
-This type of tunnel will be widely used only when transit operators phase IPv4 out (i.e., not any soon).
+This type of tunnel will be widely used only when transit operators phase IPv4 out (i.e., not any time soon).
 
 <h3 id="ip-tunnel-add-ip6ip6">Create an IP6IP6 tunnel</h3>
 
@@ -822,7 +822,7 @@ ip link set dev tun3 up
 ip address add 2001:db8:2:2::1/64 dev tun3
 ```
 
-Just like IPIP6 these ones aren't going to be widely used any soon.
+Just like IPIP6 these ones aren't going to be widely used any time soon.
 
 <h3 id="ip-tunnel-add-gretap">Create an L2 GRE tunnel device</h3>
 
@@ -1180,7 +1180,7 @@ Such routes are called connected routes.
 
 For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network will be created, and the system will know that hosts from that network can be reached directly.
 
-When an interface goes down, connected routes associated with it are removed and all routes who gateway belong to the now-inaccessible networks are removed as well
+When an interface goes down, connected routes associated with it are removed and all routes whose gateway belongs to the now inaccessible networks are removed as well
 because they fail gateway reachability check.
 The same mechanism prevents you from creating routes through inaccessible gateways.
 
@@ -1369,7 +1369,7 @@ These routes make the system discard packets and reply with an ICMP error messag
 Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g., DDoS) because they generate a reply packet for every discarded packet and thus create an even greater traffic flow.
 They can be good for implementing internal access policies, but a firewall is usually a better idea.
 
-"Throw" routes may be used for implementing policy-based routing. In non-default, tables they stop the lookup process but don't send ICMP error messages.
+"Throw" routes may be used for implementing policy-based routing. In non-default tables they stop the lookup process but don't send ICMP error messages.
 
 <h3 id="ip-route-add-metric">Routes with different metrics</h3>
 
@@ -1786,7 +1786,7 @@ First, create a pair of veth devices: `ip link add name veth1 type veth peer nam
 
 Move veth2 to namespace foo: `ip link set dev veth2 netns foo`.
 
-Bring veth2 and add an address in "foo" namespace: 
+Bring veth2 up and add an address in "foo" namespace: 
 
 ```
 ip netns exec foo ip link set dev veth2 up
@@ -1900,13 +1900,13 @@ ip -4 monitor address
 <h3 id="rtmon">Read a log file produced by rtmon</h3>
 
 iproute2 includes a program called `rtmon` that serves essentially the same purpose but writes events to a binary log file instead of displaying them.
-You can read those logs file with an `ip monitor` command.
+You can read those log files with the `ip monitor` command:
 
 ```
 ip monitor ${event type} file ${path to the log file}
 ```
 
-The rtmon syntax is similar to that of `ip monitor`, except event types are limited to `link`, `address`, `route`, and `all`; and address family is specified in the `-family` option.
+The rtmon syntax is similar to that of `ip monitor`, except event types are limited to `link`, `address`, `route`, and `all`; and address family is specified using the `-family` option:
 
 ```
 rtmon [-family <inet|inet6>] [<route|link|address|all>] file ${log file path}
