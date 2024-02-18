@@ -1738,8 +1738,11 @@ Example: `ip netns exec foo /bin/sh`.
 
 Note: assigning a process to a non-default namespace requires root privileges.
 
-You can run any processes inside a namespace, in particular, you can run `/sbin/ip` itself. Commands like `ip netns exec foo ip link list` in this section are not special:
-we are simply executing another copy of `ip` in a namespace. You can run an interactive shell inside a namespace as well.
+You can run any processes inside a namespace, including an interactive shell.
+If you want to run `/sbin/ip` itself in another namespace, you can use either
+`ip netns exec ${namespace name} ip ${ip subcommand}` (same as with any other
+command), or the `-n`/`-netns` shortcut:
+`ip -n ${namespace name} ${ip subcommand}`.
 
 <h3 id="ip-netns-pids">List all processes assigned to a namespace</h3>
 
@@ -1767,14 +1770,14 @@ ip link set dev ${interface name} netns ${pid}
 
 Example: `ip link set dev eth0.100 netns foo`.
 
-Note: once you assign an interface to a namespace, it disappears from the default namespace, and you will have to perform all operations with it via `ip netns exec ${netspace name}`,
-like `ip netns exec ${netspace name} ip link set dev dummy0 down`.
+Note: once you assign an interface to a namespace, it disappears from the default namespace, and you will have to perform all operations with it via `ip netns exec ${namespace name}` or `ip -n ${namespace name} ${ip subcommand}`,
+like `ip -n ${namespace name} link set dev dummy0 down`.
 
 Moreover, when you move an interface to another namespace, it loses all existing configuration such as IP addresses configured on it and goes to the DOWN state.
 You'll need to bring it back up and reconfigure it.
 
 If you specify a PID instead of a namespace name, the interface gets assigned to the primary namespace of the process with that PID.
-This way you can reassign an interface back to the default namespace with e.g., `ip netns exec ${namespace name} ip link set dev ${intf} netns 1`
+This way you can reassign an interface back to the default namespace with e.g., `ip -n ${namespace name} link set dev ${intf} netns 1`
 (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).
 
 <h3 id="ip-netns-veth-connect">Connect one namespace to another</h3>
@@ -1789,9 +1792,9 @@ Move veth2 to namespace foo: `ip link set dev veth2 netns foo`.
 Bring veth2 up and add an address in "foo" namespace: 
 
 ```
-ip netns exec foo ip link set dev veth2 up
+ip -n foo link set dev veth2 up
 
-ip netns exec foo ip address add 10.1.1.1/24 dev veth2
+ip -n foo address add 10.1.1.1/24 dev veth2
 ```
 
 Add an address to veth1, which stays in the default namespace: `ip address add 10.1.1.2/24 dev veth1`.
