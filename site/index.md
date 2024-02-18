@@ -804,7 +804,7 @@ ip -6 tunnel add ${interface name} mode ipip6 local ${local endpoint address} re
 
 Examples: `ip -6 tunnel add tun8 mode ipip6 local 2001:db8:1::1 remote 2001:db8:1::2`
 
-This type of tunnel will be widely used only when transit operators phase IPv4 out (i.e., not any soon).
+This type of tunnel will be widely used only when transit operators phase IPv4 out (i.e., not any time soon).
 
 <h3 id="ip-tunnel-add-ip6ip6">Create an IP6IP6 tunnel</h3>
 
@@ -822,7 +822,7 @@ ip link set dev tun3 up
 ip address add 2001:db8:2:2::1/64 dev tun3
 ```
 
-Just like IPIP6 these ones aren't going to be widely used any soon.
+Just like IPIP6 these ones aren't going to be widely used any time soon.
 
 <h3 id="ip-tunnel-add-gretap">Create an L2 GRE tunnel device</h3>
 
@@ -1180,7 +1180,7 @@ Such routes are called connected routes.
 
 For example, if you assign 203.0.113.25/24 to eth0, a connected route to 203.0.113.0/24 network will be created, and the system will know that hosts from that network can be reached directly.
 
-When an interface goes down, connected routes associated with it are removed and all routes who gateway belong to the now-inaccessible networks are removed as well
+When an interface goes down, connected routes associated with it are removed and all routes whose gateway belongs to the now inaccessible networks are removed as well
 because they fail gateway reachability check.
 The same mechanism prevents you from creating routes through inaccessible gateways.
 
@@ -1369,7 +1369,7 @@ These routes make the system discard packets and reply with an ICMP error messag
 Unlike blackhole routes, these can't be recommended for stopping unwanted traffic (e.g., DDoS) because they generate a reply packet for every discarded packet and thus create an even greater traffic flow.
 They can be good for implementing internal access policies, but a firewall is usually a better idea.
 
-"Throw" routes may be used for implementing policy-based routing. In non-default, tables they stop the lookup process but don't send ICMP error messages.
+"Throw" routes may be used for implementing policy-based routing. In non-default tables they stop the lookup process but don't send ICMP error messages.
 
 <h3 id="ip-route-add-metric">Routes with different metrics</h3>
 
@@ -1738,8 +1738,11 @@ Example: `ip netns exec foo /bin/sh`.
 
 Note: assigning a process to a non-default namespace requires root privileges.
 
-You can run any processes inside a namespace, in particular, you can run `/sbin/ip` itself. Commands like `ip netns exec foo ip link list` in this section are not special:
-we are simply executing another copy of `ip` in a namespace. You can run an interactive shell inside a namespace as well.
+You can run any processes inside a namespace, including an interactive shell.
+If you want to run `ip` itself in another namespace, you can use either
+`ip netns exec ${namespace name} ip ${ip subcommand}` (same as with any other
+command), or the `-n`/`-netns` shortcut:
+`ip -n ${namespace name} ${ip subcommand}`.
 
 <h3 id="ip-netns-pids">List all processes assigned to a namespace</h3>
 
@@ -1767,14 +1770,14 @@ ip link set dev ${interface name} netns ${pid}
 
 Example: `ip link set dev eth0.100 netns foo`.
 
-Note: once you assign an interface to a namespace, it disappears from the default namespace, and you will have to perform all operations with it via `ip netns exec ${netspace name}`,
-like `ip netns exec ${netspace name} ip link set dev dummy0 down`.
+Note: once you assign an interface to a namespace, it disappears from the default namespace, and you will have to perform all operations with it via `ip netns exec ${namespace name}` or `ip -n ${namespace name} ${ip subcommand}`,
+like `ip -n ${namespace name} link set dev dummy0 down`.
 
 Moreover, when you move an interface to another namespace, it loses all existing configuration such as IP addresses configured on it and goes to the DOWN state.
 You'll need to bring it back up and reconfigure it.
 
 If you specify a PID instead of a namespace name, the interface gets assigned to the primary namespace of the process with that PID.
-This way you can reassign an interface back to the default namespace with e.g., `ip netns exec ${namespace name} ip link set dev ${intf} netns 1`
+This way you can reassign an interface back to the default namespace with e.g., `ip -n ${namespace name} link set dev ${intf} netns 1`
 (since init or another process with PID 1 is pretty much guaranteed to be in default namespace).
 
 <h3 id="ip-netns-veth-connect">Connect one namespace to another</h3>
@@ -1786,12 +1789,12 @@ First, create a pair of veth devices: `ip link add name veth1 type veth peer nam
 
 Move veth2 to namespace foo: `ip link set dev veth2 netns foo`.
 
-Bring veth2 and add an address in "foo" namespace: 
+Bring veth2 up and add an address in "foo" namespace: 
 
 ```
-ip netns exec foo ip link set dev veth2 up
+ip -n foo link set dev veth2 up
 
-ip netns exec foo ip address add 10.1.1.1/24 dev veth2
+ip -n foo address add 10.1.1.1/24 dev veth2
 ```
 
 Add an address to veth1, which stays in the default namespace: `ip address add 10.1.1.2/24 dev veth1`.
@@ -1900,13 +1903,13 @@ ip -4 monitor address
 <h3 id="rtmon">Read a log file produced by rtmon</h3>
 
 iproute2 includes a program called `rtmon` that serves essentially the same purpose but writes events to a binary log file instead of displaying them.
-You can read those logs file with an `ip monitor` command.
+You can read those log files with the `ip monitor` command:
 
 ```
 ip monitor ${event type} file ${path to the log file}
 ```
 
-The rtmon syntax is similar to that of `ip monitor`, except event types are limited to `link`, `address`, `route`, and `all`; and address family is specified in the `-family` option.
+The rtmon syntax is similar to that of `ip monitor`, except event types are limited to `link`, `address`, `route`, and `all`; and address family is specified using the `-family` option:
 
 ```
 rtmon [-family <inet|inet6>] [<route|link|address|all>] file ${log file path}
