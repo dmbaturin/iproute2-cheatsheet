@@ -1156,6 +1156,61 @@ ip link add name vxlan0 type vxlan \
 
 After that you need to [bring the link up](#ip-link-set-up-down) and either bridge it with another interface or assign an address to it.
 
+<h2 id="ip-link-geneve">GENEVE</h2>
+<hr>
+
+GENEVE (Generic Virtual Network Encapsulation) is tunneling protocol that generally carries L2 frames. Its underlying encapsulation is UDP (the default port is 6081).
+
+Its goals are similar to VXLAN, NVGRE, and STT; but unlike those protocols it's extensible and supports adding arbitrary options to the header,
+to ensure it can adapt to future networking needs.
+
+Like VXLAN, GENEVE uses 24-bit VNIs (virtual network identifiers). Per protocol specification, it can be either unicast or multicast,
+but the Linux kernel only supports the unicast mode for "internally" managed GENEVE tunnels as of Linux 6.10.
+
+<h3 id="ip-geneve-add-unicast">Create a unicast GENEVE link</h3>
+
+```
+ip link add name ${interface name} type geneve \
+   id <0-16777215> \
+   remote ${IPv4 or IPv6 address}
+```
+
+Examples:
+
+```
+ip link add name gnv0 type geneve id 20 remote 192.0.2.20
+ip link	add name gnv1 type geneve id 30	remote 2001:db8:ab:cd::19
+```
+
+<h3 id="ip-geneve-add-custom-port">Create a unicast GENEVE link with a custom UDP port</h3>
+
+It's possible to specify a custom UDP port instead of the default value of 6081:
+
+Examples:
+
+```
+ip link add name gnv2 type geneve id 1234 remote 192.0.2.20 dstport 7081
+```
+
+<h3 id="ip-geneve-add-external">Create an externally managed GENEVE device</h3>
+
+It's possible to create a GENEVE device without any addresses or anything else,
+and then use `tc` filters to encapsulate packets in GENEVE and add arbitrary headers.
+
+```
+ip link add name ${interface name} external [dstport ${UDP port}]
+```
+
+**Note:** there can be only one externally managed GENEVE device per UDP port,
+so if you need multiple devices, use different `dstport` options for each one of them.
+
+Examples:
+
+```
+ip link	add name gnv0 external
+ip link add name gnv1 external dstport 7081
+```
+
 <h2 id="ip-route">Routing tables</h2>
 <hr>
 
