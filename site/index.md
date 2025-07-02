@@ -511,41 +511,6 @@ They can be used for communication inside a single host.
 A loopback or a dummy interface is also a good place to assign a management address
 on a router with multiple physical interfaces.
 
-<h3 id="ip-link-add-bridge">Create a bridge interface</h3>
-
-```
-ip link add name ${bridge name} type bridge
-```
-
-Examples: `ip link add name br0 type bridge`
-
-Bridge interfaces are virtual Ethernet switches.
-You can use them to turn a Linux box into a slow L2 switch, or to enable communication between virtual machines on a hypervisor host.
-Note that turning a Linux box into a physical switch isn't a completely absurd idea, since unlike dumb hardware switches, it
-can work as a transparent firewall.
-
-You can assign an IP address to a bridge and, it will be visible from all bridge ports.
-
-If bridge creation fails, check if the `bridge` module is loaded.
-
-<h3 id="ip-link-set-master">Add a bridge port</h3>
-
-```
-ip link set dev ${interface name} master ${bridge name}
-```
-
-Examples: `ip link set dev eth0 master br0`
-
-An interface you add to a bridge becomes a virtual switch port. It operates only on the data link layer and ceases all network layer operation.
-
-<h3 id="ip-link-set-nomaster">Delete a bridge port</h3>
-
-```
-ip link set dev ${interface name} nomaster
-```
-
-Examples: `ip link set dev eth0 nomaster`
-
 <h3 id="ip-link-add-bond">Create a bonding interface</h3>
 
 ```
@@ -662,6 +627,144 @@ ip link list group 42
 
 ip address show group customers
 ```
+
+<h2 id="bridge">Bridges</h2>
+
+Bridge interfaces are virtual Ethernet switches.
+
+You can use them to turn a Linux box into a slow L2 switch, or to enable communication between virtual machines on a hypervisor host.
+
+Note that turning a Linux box into a physical switch isn't a completely absurd idea, since unlike dumb hardware switches, it can work as a transparent firewall.
+
+You can assign an IP address to a bridge and it will be visible from all bridge ports.
+
+If bridge creation fails, check if the `bridge` module is loaded.
+
+<h3 id="bridge-utility">Bridge management utilities</h3>
+
+Bridges in Linux are managed with two different utilities. For creating bridges and adding or removing ports,
+you will need commands from the `ip link` family. Many other tasks, such as assigning port VLANs and viewing bridge forwarding tables,
+require a command called `bridge`. That command should not be confused with the older `brctl` utility.
+
+
+<h3 id="ip-link-add-bridge">Create a bridge</h3>
+
+```
+ip link add name ${bridge name} type bridge
+```
+
+Examples: `ip link add name br0 type bridge`
+
+<h3 id="ip-link-set-master">Add a bridge port</h3>
+
+```
+ip link set dev ${interface name} master ${bridge name}
+```
+
+Examples: `ip link set dev eth0 master br0`
+
+An interface you add to a bridge becomes a virtual switch port. It operates only on the data link layer and ceases all network layer operation.
+
+<h3 id="ip-link-set-nomaster">Delete a bridge port</h3>
+
+```
+ip link set dev ${interface name} nomaster
+```
+
+Examples: `ip link set dev eth0 nomaster`
+
+<h3 id="bridge-vlan-show">View bridge port information</h3>
+
+```
+bridge [-detail] link show [<intf>]
+```
+
+Examples:
+
+* `bridge -detail link show` — show ports of all bridges.
+* `bridge link show br0` — show ports of `br0` only.
+
+
+<h3 id="bridge-link-isolated">Isolate a bridge port</h3>
+
+In many settings, client hosts only need to communicate to the router rather than to other clients.
+Linux bridges allow marking ports as "isolated" — an isolated port cannot communicate with a non-isolated port.
+
+You can mark a port isolated using the following command:
+
+```
+bridge link set dev <intf> isolated <on|off>
+```
+
+Example: 
+
+```
+bridge set dev eth0 isolated on
+bridge set dev eth1 isolated on
+```
+
+In this example, `eth0` will not be able to communicate directly with `eth1` anymore,
+but will still communicate with the Linux bridge host itself, and with any ports not marked as isolated.
+
+<h3 id="ip-link-add-bridge-vlan-filtering">Create a VLAN-aware bridge</h3>
+
+By default, Linux bridges act like unmanaged switches. However, it's possible to make them VLAN-aware
+and then set ports as trunk or access ports.
+
+To enable VLANs, add `vlan_filtering 1` to the command options. You can also set the VLAN protocol
+(802.1q or 802.1ad for nested QinQ VLANs) and set the default VLAN value with `vlan_default_pvid`.
+
+```
+ip link add name ${bridge name} type bridge vlan_filtering 1 [vlan_protocol <802.1q|802.1ad>] [vlan_default_pvid <num>] 
+```
+
+Examples: `ip link add name br0 type bridge vlan_filtering 1`
+
+<h3 id="bridge-vlan-access-port">Create a VLAN access port</h3>
+
+```
+bridge vlan add vid <tag> dev <intf> pvid untagged
+```
+
+Example: `bridge vlan add vid 100 dev eth0 pvid untagged`
+
+<h3 id="bridge-vlan-trunk-port">Create a VLAN trunk port</h3>
+
+If you don't specify `pvid` and/or `untagged` option, the bridge will assume
+that the client device assigns VLAN tags itself.
+
+```
+bridge vlan add vid <tag> dev <intf>
+```
+
+**Note**: it's possible to specify a range of VLANs rather than a single tag, like `vid 100-200`.
+
+Example: `bridge vlan add vid 100-200 dev eth0`.
+
+<h3 id="bridge-vlan-show">View bridge VLAN information</h3>
+
+```
+bridge [-com|-compressvlans|-detail] vlan show
+```
+
+Example: `bridge -detail vlan show`
+
+**Note**: `bridge vlan show` command displays all individual VLANs from all ranges by default.
+If you do something like `bridge vlan add vid 500-550 dev eth0`, you wil get fifty lines of individual VLANs.
+To display contiguous ranges like `500-550`, add `-com`/`-compressvlans`.
+If you use `-detail`, VLAN range compression is enabled automatically.
+
+<h3 id="bridge-fdb-show">View bridge forwarding table</h3>
+
+```
+bridge fdb show [dev <intf>]
+```
+
+Running `ip neighbor show dev br0` will only show MAC addresses of devices that
+have already communicated _with the bridge host_. MAC addresses of devices
+that only communicate with other bridge ports can be viewed using `bridge fdb show` commands instead.
+
+Example: `bridge fdb show dev br0` — show the MAC address table for bridge `br0`.
 
 <h2 id="ip-tuntap">TUN and TAP devices</h2>
 <hr>
