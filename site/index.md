@@ -1,42 +1,36 @@
 ## Overview of iproute2
 
-iproute2 is the Linux networking toolkit that replaced net-tools (`ifconfig`, `vconfig`, `route`, `arp` etc.).
+[iproute2](https://wiki.linuxfoundation.org/networking/iproute2) is the Linux networking toolkit that replaced legacy tools
+(`ifconfig`, `vconfig`, `brctl`, `route`, `arp` etc.). Those tools are only kept for compatibility with old scripts
+and do not provide access to a lot of newer networking features of the Linux kernel.
+
+It originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger.
+
 Most of the networking functionality is unified in the `ip` command. There's also `tc` for managing traffic policies (QoS),
-and `ss` (a `netstat` replacement), but this document is focused on the `ip` part.
+`bridge` for managing software bridge interfaces, and `ss` (a `netstat` replacement).
 
-iproute2 was originally written by Alex Kuznetsov and is now maintained by Stephen Hemminger.
-
-#### Why learn "new" commands?
-
-First, iproute2 is not new at all. It's been a standard Linux tool since the early 2000's
-and has been included in every [GNU/]Linux distro by default for a long time.
-
-Old-style network utilities like `ifconfig` and `route` are still there only for backward compatibility.
-They are no longer actively developed. Recent versions of many GNU/Linux distributions no longer install them by default.
-
-A lot of networking features cannot be configured with the old tools and that list is only growing: VRF, network namespaces, policy-based routing, and so on.
-The `ip` command provides access to all those features. It also offers a more uniform syntax: for example, `ip link set dev eno1 nomaster`
-will work with bridge ports, link aggregation groups, and VRF; while the old approach would make you memorize the syntax of three different commands
-for those tasks.
-
-It's a tool that takes time to learn, but it's a good time investment for every system and network administrator who works with Linux.
+Those commands are usually shipped in a package called `iproute2` or `iproute`.
+Most Linux distributions install it by default these days.
+The `ip` command is sometimes installed in `/sbin` and thus may not be in the `$PATH` of unprivileged users by default.
 
 ## About this document
 
 Historically, documentation has been a weak side of iproute2. The official man pages list available options but don't give almost any usage examples.
 That need has been addressed by third-party documentation.
 
-This document aims to provide a comprehensive but easy to use guide to the `ip` command. The `ip` command controls almost all network subsystems of the Linux kernel.
+This document aims to provide a comprehensive but easy to use guide to the `ip` and `bridge` commands,
+and some information about `ss`.
 Documenting `tc` in this style would be a separate big project.
 
-The document is _task-centered_: it tells you how to do different tasks using `ip` instead of listing available subcommands.
-It was once called a "cheatsheet" for this reason but has long outgrown the size and scope of a cheat sheet.
+The document is _task-centered_: it tells you how to do different tasks using iproute2 commands instead of listing available subcommands.
 
 ## Contributing
 
-This document is maintained by [Daniil Baturin](https://www.baturin.org) and distributed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)—a strong copyleft, free culture license.
+This document is maintained by [Daniil Baturin](https://www.baturin.org) and distributed under
+[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — a strong copyleft, free culture license.
 
-Contributions are always welcome; you can find the source files at [github.com/dmbaturin/iproute2-cheatsheet](https://github.com/dmbaturin/iproute2-cheatsheet).
+Contributions are always welcome; you can find the source files at
+[github.com/dmbaturin/iproute2-cheatsheet](https://github.com/dmbaturin/iproute2-cheatsheet).
 
 ```
 git clone https://github.com/dmbaturin/iproute2-cheatsheet.git
@@ -44,8 +38,8 @@ git clone https://github.com/dmbaturin/iproute2-cheatsheet.git
 
 You can also show your support by buying the maintainer a [metaphorical coffee](https://www.buymeacoffee.com/dmbaturin).
 
-This document is provided "as is", without any warranty. The authors are not liable for any damage related to using it. As usual, think before you type,
-and think twice before hitting the Enter key.
+This document is provided "as is", without any warranty. The authors are not liable for any damage related to using it.
+As usual, think before you type, and think twice before hitting the Enter key.
 
 ## Typographic conventions
 
@@ -67,11 +61,12 @@ In some cases, you can even omit words. For example, `show` and `list` words are
 Note that the abbreviation system is not always consistent. The `dev` keyword in `ip a a 192.0.2.1/24 dev eth0` cannot be abbreviated, even though every other word can be.
 
 This document intentionally gives all commands in their fullest form for better readability.
-Using abbreviated commands in scripts and documentation isn't a good idea since the intent may not be immediately obvious to the reader.
+It's also a good idea to use full forms in scripts because readers may not be familiar with abbreviations,
+and code is read much more often than it's written. 
 
 ## Scripting considerations
 
-A common complaint about distributions removing  `ifconfig` is that it forces people to rewrite scripts.
+A common complaint about distributions removing `ifconfig` is that it forces people to rewrite scripts.
 However, iproute2 is better for scripting since it supports machine-readable output.
 
 It provides the following output options:
@@ -2098,6 +2093,3 @@ Grammar, style, typo fixes: Trick van Staveren, powyginanachochla, Nathan Handle
 Achilleas Pipinellis, fauxm, fgtham, eri, Zhuoyun Wei, Jonathan ZHAO, Julien Barbot, thoastbrot.
 
 Design: elico, alex-eri.
-
-
-
