@@ -1664,6 +1664,25 @@ ip rule add to 192.0.2.0/24 blackhole
 ip -6 rule add to 2001:db8::/32 lookup 100
 ```
 
+<h3 id="ip-rule-add-proto">Create rule to match specific protocol or port</h3>
+
+On more recent linux kernels (>=4.18.0), you can create rules to match specific source/destination ports or ip 
+protocols.
+
+```
+ip rule add <ipproto|sport|dport> ${range or value} ${action}
+```
+
+Examples:
+
+```
+ip rule add ipproto udp dport 53 lookup 110
+
+ip rule add ipproto tcp dport 1200-1400 lookup 100
+
+ip rule add sport 4242 lookup 110
+```
+
 <h3 id="ip-rule-add-tos">Create a rule to match a ToS field value</h3>
 
 ```
