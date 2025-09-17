@@ -1850,6 +1850,24 @@ Example: `ip vrf exec ping 192.0.2.100`.
 
 The traffic of the process will be routed according to the VRF table routes, so it's useful for troubleshooting.
 
+<h3 id="ip-vrf-identify">Check if a process is running in a VRF</h3>
+
+```
+ip vrf identify ${pid}
+```
+
+If the process with PID `${pid}` is running in a VRF, the command will display its name.
+If it is not running in a VRF, the command output is empty.
+
+<h3 id="ip-vrf-pids">List processes running in a VRF</h3>
+
+```
+ip vrf pids ${vrf}
+```
+
+If `${vrf}` does not exist, the command will show an error message.
+If it exists but there are no processed running in it, the output is empty.
+
 <h2 id="ip-netns">Network namespaces</h2>
 <hr>
 
